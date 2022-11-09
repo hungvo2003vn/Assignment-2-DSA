@@ -69,7 +69,5 @@ int main() {
     tc3();
     tc4();
     system("pause");
-    // concat
-    //hehehehehe
     return 0;
 }

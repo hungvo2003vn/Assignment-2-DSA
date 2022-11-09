@@ -7,7 +7,7 @@ ConcatStringTree::ConcatStringTree(const char* s) {
 
 	string tmp = string(s);
 	Root = new Node(0, (int)tmp.length(), tmp, NULL, NULL);
-	//hello world
+	
 	//Update Parent for Node
 	Root->Par = new ParentsTree();
 	Root->Par->Paroot = new ParNode(max_id, NULL, NULL, 0);
