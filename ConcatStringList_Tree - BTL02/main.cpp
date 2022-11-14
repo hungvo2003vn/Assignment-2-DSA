@@ -1,4 +1,15 @@
 #include "ConcatStringTree.h"
+#define _CRTDBG_MAP_ALLOC
+#include <cstdlib>
+#include <crtdbg.h>
+
+#ifdef _DEBUG
+#define DBG_NEW new ( _NORMAL_BLOCK , __FILE__ , __LINE__ )
+// Replace _NORMAL_BLOCK with _CLIENT_BLOCK if you want the
+// allocations to be of _CLIENT_BLOCK type
+#else
+#define DBG_NEW new
+#endif
 void tc1() {
     cout << "//////////////TEST CASE 1////////////////\n";
     cout << "\n";
@@ -22,26 +33,29 @@ void tc2() {
     ConcatStringTree s3 = s1.concat(s2);
     cout << s3.toStringPreOrder() << "." << endl;
     cout << s3.toString() << "." << endl;
-    cout << s3.subString(5, 6).toString()<< endl;
-    cout << s3.reverse().toString() << "." <<endl;
+    //cout << s3.subString(5, 6).toString()<< endl;
+    //cout << s3.reverse().toString() << "." <<endl;
     cout << endl;
+    
 }
 void tc3() {
     cout << "//////////////TEST CASE 3////////////////\n";
     cout << "\n";
-    ConcatStringTree* s1 = new ConcatStringTree("a");
-    ConcatStringTree* s2 = new ConcatStringTree("bc");
-    ConcatStringTree* s3 = new ConcatStringTree(s1->concat(*s2));
+    ConcatStringTree* s1 = DBG_NEW ConcatStringTree("a");
+    ConcatStringTree* s2 = DBG_NEW ConcatStringTree("bc");
+    ConcatStringTree* s3 = DBG_NEW ConcatStringTree(s1->concat(*s2));
     cout << s3->getParTreeSize("l") <<endl;
     cout << s3 -> getParTreeStringPreOrder("l") << endl;
 
-    ConcatStringTree* s4 = new ConcatStringTree(s3->reverse());
+    /*ConcatStringTree* s4 = new ConcatStringTree(s3->reverse());
     cout << s4->getParTreeSize("l") << endl;
-    cout << s4->getParTreeStringPreOrder("l") << endl;
+    cout << s4->getParTreeStringPreOrder("l") << endl;*/
 
-    //delete s1;
-    //delete s2;
-    //delete s3;
+
+    delete s3;    
+    delete s2;
+    delete s1;
+    //delete s4;
     cout<<endl;
 }
 void tc4() {
@@ -56,7 +70,7 @@ void tc4() {
     cout << s5.toStringPreOrder() << endl;
     cout << s5.toString() << endl;
     cout << "char at index 8: " << s5.get(8) << endl;
-    cout << "first appearance of k: " << s5.indexOf('a') << endl;
+    cout << "first appearance of a: " << s5.indexOf('a') << endl;
     cout << s5.subString(1, 4).reverse().toString() << endl;
 
     cout << s5.getParTreeStringPreOrder("ll") << endl;
@@ -67,7 +81,8 @@ int main() {
     tc1();
     tc2();
     tc3();
-    tc4();
+    //tc4();
+    _CrtDumpMemoryLeaks();
     system("pause");
     return 0;
 }

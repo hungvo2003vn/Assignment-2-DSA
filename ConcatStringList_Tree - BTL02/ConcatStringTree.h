@@ -63,6 +63,7 @@ public:
 
     int getParTreeSize(const string& query) const;
     string getParTreeStringPreOrder(const string& query) const;
+    ~ConcatStringTree();
 
     //Helper Function
     //
@@ -79,7 +80,10 @@ public:
     //
     Node* deepRe(Node* cur) const;
     //
-    void Parents_add(Node* cur, ParNode* ele) const;
+    void Parents_add(Node* cur, int key) const;
+    void Parents_delete(Node* cur, int key) const;
+    //
+    void Concat_delete(Node* cur);
 };
 class ParentsTree {
 public:
@@ -93,8 +97,10 @@ public:
     ConcatStringTree::ParNode* Rtate(ConcatStringTree::ParNode* cur);
     ConcatStringTree::ParNode* Ltate(ConcatStringTree::ParNode* cur);
     ConcatStringTree::ParNode* MaxNode(ConcatStringTree::ParNode* cur);
-    ConcatStringTree::ParNode* insert(ConcatStringTree::ParNode* node, ConcatStringTree::ParNode* ele);
-    ConcatStringTree::ParNode* remove(ConcatStringTree::ParNode* cur, int key);
+    ConcatStringTree::ParNode* insert(ConcatStringTree::ParNode* node, int key);
+    ConcatStringTree::ParNode* remove(ConcatStringTree::ParNode* cur, int key, bool& deleted);
+    void Insert(int key);
+    void Remove(int key);
 
     int size() const;
     string toStringPreOrder() const;

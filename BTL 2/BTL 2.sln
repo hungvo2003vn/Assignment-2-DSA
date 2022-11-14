@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32922.545
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BTL 2", "BTL 2.vcxproj", "{DB7C0FA0-D366-4969-948B-BC82EA1FFA52}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ConcatStringList_Tree - BTL02 MVS", "BTL 2.vcxproj", "{DB7C0FA0-D366-4969-948B-BC82EA1FFA52}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
