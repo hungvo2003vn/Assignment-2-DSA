@@ -98,20 +98,21 @@ void tc5() {
 
     cout << litStringHash->getLastInsertedIndex() << endl;
     cout << litStringHash->toString() << endl;
-
+    
     //delete litStringHash;
-    //delete s3;
-    //delete s1;
+    delete s3;
+    delete s1;
     delete s2;
-    //cout << s3->toStringPreOrder() << "." << endl;
+    cout << litStringHash->toString() << endl;
+    delete litStringHash;
     cout << endl;
 }
 int main() {
     
-    //tc1();
-    //tc2();
-    //tc3();
-    //tc4();
+    tc1();
+    tc2();
+    tc3();
+    tc4();
     tc5();
     _CrtDumpMemoryLeaks();
     system("pause");

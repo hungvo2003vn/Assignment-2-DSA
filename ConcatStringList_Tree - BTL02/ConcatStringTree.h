@@ -31,6 +31,7 @@ public:
         Node* left;
         Node* right;
         ParentsTree* Par;
+        int num_refs = 0;
 
         Node(int LLen = 0, int len = 0, string s = "", Node* L = NULL, Node* R = NULL)
         {
@@ -40,6 +41,8 @@ public:
             data = s;
             left = L;
             right = R;
+
+            num_refs = 1;
 
             max_id++;
             id = max_id;
@@ -178,18 +181,22 @@ public:
 };
 
 class ReducedConcatStringTree:public ConcatStringTree  {
+
 public:
-    ReducedConcatStringTree(const char* s, LitStringHash* litStringHash);
+    Node* ReRoot;
     LitStringHash* litStringHash;
 
+public:
     ReducedConcatStringTree();
+    ReducedConcatStringTree(const char* s, LitStringHash* litStringHash);
     ReducedConcatStringTree concat(const ReducedConcatStringTree& otherS) const;
     string toStringPreOrder() const;
     string toString() const;
-
+    int getParTreeSize(const string& query) const;
+    string getParTreeStringPreOrder(const string& query) const;
     //Destructor
     void ReducedConcat_delete(Node* &cur);
-    virtual ~ReducedConcatStringTree();
+    ~ReducedConcatStringTree();
 };
 
 #endif // __CONCAT_STRING_TREE_H__
