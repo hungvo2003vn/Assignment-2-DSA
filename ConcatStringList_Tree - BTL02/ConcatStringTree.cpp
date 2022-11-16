@@ -632,7 +632,7 @@ int LitStringHash::insert(string s) {
 void LitStringHash::Rehash() {
 	if (all_nodes / (1.0*m) > hashConfig.getLambda()) 
 	{
-		int new_size = hashConfig.getAlpha() * m;
+		int new_size = (int)(hashConfig.getAlpha() * m);
 
 		LitString* tmp = new LitString[new_size];
 		STATUS* tatus = new STATUS[new_size];

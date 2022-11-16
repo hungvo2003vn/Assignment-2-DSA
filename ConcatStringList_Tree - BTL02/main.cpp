@@ -122,9 +122,9 @@ int main() {
     //tc1();
     //tc2();
     //tc3();
-    //tc4();
+    tc4();
     //tc5();
-    tc6();
+    //tc6();
     _CrtDumpMemoryLeaks();
     system("pause");
     return 0;
