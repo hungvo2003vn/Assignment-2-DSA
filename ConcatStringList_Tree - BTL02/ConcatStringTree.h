@@ -121,16 +121,23 @@ private:
     friend class ReducedConcatStringTree;
 public:
     HashConfig();
+    HashConfig(const HashConfig& other);
     HashConfig(int p, double c1, double c2, double lambda,
                double alpha, int initSize);
-    void change(int p, double c1, double c2, double lambda,
-               double alpha, int initSize);
+    //Get the private value
     int getP() const;
     double getC1() const;
     double getC2() const;
     double getLambda() const;
     double getAlpha() const;
     int getInitSize() const;
+    //Change the private value
+    void changeP(int P);
+    void changeC1(double C1);
+    void changeC2(double C2);
+    void changeLambda(double Lambda);
+    void changeAlpha (double Alpha);
+    void changeInitSize(int InitSize);
 };
 
 class LitStringHash {
@@ -138,21 +145,20 @@ public:
     struct LitString {
 
         int num_refs;
-        ConcatStringTree::Node* nod;
-        LitString(int nums = 1, ConcatStringTree::Node* node = NULL) 
+        string data;
+        LitString(int nums = 1, string s="")
         {
             num_refs = nums;
-            nod = node;
+            this->data = s;
         }
     };
 public:
-    HashConfig hashConfig=HashConfig();
+    HashConfig hashConfig;
     int m;
-    int all_nodes=0;
-    int last_index=-1;
-    LitString* bucket=NULL;
-    STATUS* status=NULL;
-
+    int all_nodes;
+    int last_index;
+    LitString* bucket;
+    STATUS* status;
 public:
     LitStringHash();
     LitStringHash(const HashConfig& hashConfig);
@@ -161,7 +167,7 @@ public:
 
     int h(string s);
     int hp(string s, int i);
-    int insert(string s);
+    void insert(string s);
     void Rehash();
     void remove(string s);
     int search(string s);

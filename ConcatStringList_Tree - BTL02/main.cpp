@@ -112,8 +112,11 @@ void tc6() {
         4
     );
     LitStringHash* litStringHash = new LitStringHash(hashConfig);
-    litStringHash->insert("a");
-    //litStringHash->insert("a");
+    string s1 = string("Hello");
+    string s2 = string("there");
+    string s3 = string("here");
+    litStringHash->insert(s1);
+    litStringHash->insert(s2);
     cout << litStringHash->getLastInsertedIndex() << endl;
     cout << litStringHash->toString() << endl;
 }
@@ -122,9 +125,9 @@ int main() {
     //tc1();
     //tc2();
     //tc3();
-    tc4();
+    //tc4();
     //tc5();
-    //tc6();
+    tc6();
     _CrtDumpMemoryLeaks();
     system("pause");
     return 0;

@@ -515,6 +515,14 @@ HashConfig::HashConfig() {
 	this->alpha = 0.0;
 	this->initSize = 0;
 }
+HashConfig::HashConfig(const HashConfig& other) {
+	this->p = other.p;
+	this->c1 = other.c1;
+	this->c2 = other.c2;
+	this->lambda = other.lambda;
+	this->alpha = other.alpha;
+	this->initSize = other.initSize;
+}
 HashConfig::HashConfig(int P, double C1, double C2, double Lambda,
 					   double Alpha, int InitSize) {
 	this->p = P;
@@ -524,15 +532,7 @@ HashConfig::HashConfig(int P, double C1, double C2, double Lambda,
 	this->alpha = Alpha;
 	this->initSize = InitSize;
 }
-void HashConfig::change(int P, double C1, double C2, double Lambda,
-						double Alpha, int InitSize) {
-	this->p = P;
-	this->c1 = C1;
-	this->c2 = C2;
-	this->lambda = Lambda;
-	this->alpha = Alpha;
-	this->initSize = InitSize;
-}
+//Get the private value
 int HashConfig::getP() const {
 	return this->p;
 }
@@ -551,6 +551,25 @@ double HashConfig::getAlpha() const {
 int HashConfig::getInitSize() const {
 	return this->initSize;
 }
+//Chang the private value
+void HashConfig::changeP(int P) {
+	p = P;
+}
+void HashConfig::changeC1(double C1) {
+	c1 = C1;
+}
+void HashConfig::changeC2(double C2) {
+	c2 = C2;
+}
+void HashConfig::changeLambda(double Lambda) {
+	lambda = Lambda;
+}
+void HashConfig::changeAlpha(double Alpha) {
+	alpha = Alpha;
+}
+void HashConfig::changeInitSize(int InitSize) {
+	initSize = InitSize;
+}
 ////////////CLASS LITSTRINGHASH///////////
 LitStringHash::LitStringHash() {
 	hashConfig = HashConfig();
@@ -562,10 +581,12 @@ LitStringHash::LitStringHash() {
 }
 LitStringHash::LitStringHash(const HashConfig& hashConfig) {
 
-	this->hashConfig = hashConfig;
+	this->hashConfig = HashConfig(hashConfig);
+
 	m = this->hashConfig.getInitSize();
 	all_nodes = 0;
 	last_index = -1;
+
 	bucket = new LitString[m];
 	status = new STATUS[m];
 	for (int i = 0; i < m; i++) status[i] = NIL;
@@ -574,12 +595,12 @@ LitStringHash::LitStringHash(const HashConfig& hashConfig) {
 int LitStringHash::h(string s) {
 	int ans = 0;
 	int times = 1;
-	for (int i = 0; i < (int)s.length(); i++) 
+	for (int i = 0; i < (int)s.length(); i++)
 	{
 		ans = (ans + ( ((int)s[i])%m * times)%m )%m;
 		times = (times * ((hashConfig.getP())%m)  )%m;
 	}
-	return ans;
+	return ans%m;
 }
 int LitStringHash::hp(string s, int i) {
 	int ans = h(s);
@@ -592,18 +613,15 @@ int LitStringHash::hp(string s, int i) {
 	ans =  (int)(ans+(c1_i+c2_i2)) % m;
 	return ans;
 }
-int LitStringHash::insert(string s) {
+void LitStringHash::insert(string s) {
 	int i = 0;
 	do 
 	{
-		int slot = hp(s, i);
+		int slot = hp(s,i);
 		if (status[slot] == NIL || status[slot] == DELETED)
 		{
-			LitString ele = LitString();
-			ele.nod = new ConcatStringTree::Node(0, (int)s.length(), s, NULL, NULL);
-
 			//Assign value
-			bucket[i] = ele;
+			bucket[slot] = LitString(1,s);
 			status[slot] = NON_EMPTY;
 
 			//Update nums
@@ -611,9 +629,9 @@ int LitStringHash::insert(string s) {
 			last_index = slot;
 
 			Rehash(); //Rehashing
-			return slot;
+			return;
 		}
-		else if (status[slot] == NON_EMPTY && bucket[i].nod->data == s) {
+		else if (status[slot] == NON_EMPTY && bucket[i].data == s) {
 			bucket[slot].num_refs++;
 
 			//Update nums
@@ -621,7 +639,7 @@ int LitStringHash::insert(string s) {
 			last_index = slot;
 
 			Rehash();
-			return slot;
+			return;
 		}
 		else ++i;
 
@@ -630,7 +648,7 @@ int LitStringHash::insert(string s) {
 	throw runtime_error("No possible slot");
 }
 void LitStringHash::Rehash() {
-	if (all_nodes / (1.0*m) > hashConfig.getLambda()) 
+	if (all_nodes / (1.0*m) - hashConfig.getLambda() >1e-7) 
 	{
 		int new_size = (int)(hashConfig.getAlpha() * m);
 
@@ -641,7 +659,8 @@ void LitStringHash::Rehash() {
 		for (int i = 0; i < m && i < new_size; i++) 
 		{
 			tatus[i] = status[i];
-			if(status[i] == NON_EMPTY) tmp[i] = bucket[i];
+			if (status[i] == NON_EMPTY) 
+				tmp[i] = LitString(bucket[i].num_refs, bucket[i].data);
 		}
 		delete[] status;
 		delete[] bucket;
@@ -651,8 +670,7 @@ void LitStringHash::Rehash() {
 
 		//Update size and hashConfig
 		m = new_size;
-		hashConfig.change(hashConfig.getP(), hashConfig.getC1(), hashConfig.getC2(),
-						  hashConfig.getLambda(), hashConfig.getAlpha(),m);
+		hashConfig.changeInitSize(m);
 	}
 }
 void LitStringHash::remove(string s) {
@@ -661,7 +679,7 @@ void LitStringHash::remove(string s) {
 	{
 		int slot = hp(s, i);
 		if (status[slot] == NIL) return;
-		else if (bucket[slot].nod->data == s)
+		else if (bucket[slot].data == s)
 		{
 			--all_nodes;
 			status[slot] = DELETED;
@@ -676,7 +694,7 @@ int LitStringHash::search(string s) {
 	do 
 	{
 		int slot = hp(s, i);
-		if (status[slot] == NON_EMPTY && bucket[slot].nod->data == s) return slot;
+		if (status[slot] == NON_EMPTY && bucket[slot].data == s) return slot;
 		else if (status[slot] == NIL) return -1;
 		else ++i;
 	} while (i < m);
@@ -690,7 +708,7 @@ string LitStringHash::toString() const {
 	for (int i = 0; i < m; i++) 
 	{
 		ans += "(";
-		//if (status[i] == NON_EMPTY) ans += "litS=\"" + bucket[i].nod->data + "\"";
+		if (status[i] == NON_EMPTY) ans += "litS=\"" + bucket[i].data + "\"";
 		ans += ");";
 	}
 	if (ans.back() == ';') ans.pop_back();
