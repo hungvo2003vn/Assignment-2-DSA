@@ -89,43 +89,21 @@ void tc5() {
     LitStringHash * litStringHash = DBG_NEW LitStringHash(hashConfig);
     ReducedConcatStringTree * s1 = DBG_NEW ReducedConcatStringTree("a", litStringHash);
     ReducedConcatStringTree * s2 = DBG_NEW ReducedConcatStringTree("bb", litStringHash);
-    ReducedConcatStringTree * s3 = DBG_NEW ReducedConcatStringTree(s1->concat(*s2));
+    ReducedConcatStringTree* s3 = DBG_NEW ReducedConcatStringTree("bb", litStringHash);
 
-    cout << s1->toString() << endl;
-    cout << s2->toString() << endl;
-    cout << s3->toString() << endl;
+    cout << s2->getParTreeSize("") << endl;
+    cout << s2->getParTreeStringPreOrder("") << endl;
+    cout << s3->getParTreeSize("") << endl;
+    cout << s3->getParTreeStringPreOrder("") << endl;
 
     cout << litStringHash->getLastInsertedIndex() << endl;
     cout << litStringHash->toString() << endl;
 
-    delete litStringHash;
-    delete s3;
-    delete s1;
+    //delete litStringHash;
+    //delete s3;
+    //delete s1;
     delete s2;
-    cout << endl;
-}
-void tc6() {
-    cout << "//////////////TEST CASE 6////////////////\n";
-    HashConfig hashConfig(
-        2,
-        0.5,
-        0.5,
-        0.75,
-        2,
-        4
-    );
-    LitStringHash* litStringHash = DBG_NEW LitStringHash(hashConfig);
-    string s1 = string("Hello");
-    string s2 = string("there");
-    string s3 = string("here");
-    litStringHash->insert(s1);
-    litStringHash->insert(s1);
-    litStringHash->insert(s1);
-    litStringHash->insert(s1);
-    litStringHash->insert(s1);
-
-    cout << litStringHash->getLastInsertedIndex() << endl;
-    cout << litStringHash->toString() << endl;
+    //cout << s3->toStringPreOrder() << "." << endl;
     cout << endl;
 }
 int main() {
@@ -135,7 +113,6 @@ int main() {
     //tc3();
     //tc4();
     tc5();
-    //tc6();
     _CrtDumpMemoryLeaks();
     system("pause");
     return 0;

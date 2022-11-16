@@ -64,7 +64,7 @@ public:
 
     int getParTreeSize(const string& query) const;
     string getParTreeStringPreOrder(const string& query) const;
-    ~ConcatStringTree();
+    virtual ~ConcatStringTree();
 
     //Helper Function
     //get and indexOf
@@ -84,7 +84,8 @@ public:
     void Parents_add(Node* cur, int key) const;
     void Parents_delete(Node* cur, int key) const;
     //delete parent recursion
-    void Concat_delete(Node* cur);
+    
+    void Concat_delete(Node* &cur);
 };
 class ParentsTree {
 public:
@@ -185,6 +186,10 @@ public:
     ReducedConcatStringTree concat(const ReducedConcatStringTree& otherS) const;
     string toStringPreOrder() const;
     string toString() const;
+
+    //Destructor
+    void ReducedConcat_delete(Node* &cur);
+    virtual ~ReducedConcatStringTree();
 };
 
 #endif // __CONCAT_STRING_TREE_H__
