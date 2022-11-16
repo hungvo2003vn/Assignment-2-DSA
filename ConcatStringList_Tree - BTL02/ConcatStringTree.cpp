@@ -600,7 +600,7 @@ int LitStringHash::h(string s) {
 		ans = (ans + ( ((int)s[i])%m * times)%m )%m;
 		times = (times * ((hashConfig.getP())%m)  )%m;
 	}
-	return ans%m;
+	return ans;
 }
 int LitStringHash::hp(string s, int i) {
 	int ans = h(s);
@@ -610,7 +610,7 @@ int LitStringHash::hp(string s, int i) {
 	c1_i*=i;
 	c2_i2 *= i * i;
 
-	ans =  (int)(ans+(c1_i+c2_i2)) % m;
+	ans =  (int)(ans*1.0+(c1_i+c2_i2)) % m;
 	return ans;
 }
 void LitStringHash::insert(string s) {
@@ -621,7 +621,7 @@ void LitStringHash::insert(string s) {
 		if (status[slot] == NIL || status[slot] == DELETED)
 		{
 			//Assign value
-			bucket[slot] = LitString(1,s);
+			bucket[slot] = LitString(1, s);
 			status[slot] = NON_EMPTY;
 
 			//Update nums
@@ -631,14 +631,14 @@ void LitStringHash::insert(string s) {
 			Rehash(); //Rehashing
 			return;
 		}
-		else if (status[slot] == NON_EMPTY && bucket[i].data == s) {
+		else if (status[slot] == NON_EMPTY && bucket[slot].data==s) {
 			bucket[slot].num_refs++;
 
 			//Update nums
 			all_nodes++;
 			last_index = slot;
 
-			Rehash();
+			Rehash();//rehashing
 			return;
 		}
 		else ++i;

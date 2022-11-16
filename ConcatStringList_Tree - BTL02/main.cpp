@@ -116,7 +116,11 @@ void tc6() {
     string s2 = string("there");
     string s3 = string("here");
     litStringHash->insert(s1);
-    litStringHash->insert(s2);
+    litStringHash->insert(s1);
+    litStringHash->insert(s1);
+    litStringHash->insert(s1);
+    litStringHash->insert(s1);
+
     cout << litStringHash->getLastInsertedIndex() << endl;
     cout << litStringHash->toString() << endl;
 }
