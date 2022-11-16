@@ -4,6 +4,7 @@
 #include "main.h"
 
 static int max_id=0;
+enum STATUS { NIL, NON_EMPTY, DELETED }; //status type
 class ParentsTree; //forward declaration
 class ConcatStringTree {
 
@@ -66,23 +67,23 @@ public:
     ~ConcatStringTree();
 
     //Helper Function
-    //
+    //get and indexOf
     char search_index(Node* cur, int index) const;
     int search_dfs(Node* cur, int index, char c) const;
-    //
+    //preorder
     string pre_order(Node* cur) const;
     string toStringNode(Node* cur) const;
-    //
+    //toString
     string toString_helper(Node* cur) const;
-    //
+    //subString
     Node* combine(Node* L, Node* R) const;
     Node* build_bottom(Node* root, int start, int from, int to) const;
-    //
+    //reverse
     Node* deepRe(Node* cur) const;
-    //
+    //add parent recursion
     void Parents_add(Node* cur, int key) const;
     void Parents_delete(Node* cur, int key) const;
-    //
+    //delete parent recursion
     void Concat_delete(Node* cur);
 };
 class ParentsTree {
@@ -104,13 +105,12 @@ public:
 
     int size() const;
     string toStringPreOrder() const;
-    //Helper
+    //Helper preorder
     string Format_ParNode(ConcatStringTree::ParNode* cur) const;
     string PreOrder(ConcatStringTree::ParNode* cur) const;
 };
 
-//class ReducedConcatStringTree; // forward declaration
-/*
+class ReducedConcatStringTree; // forward declaration
 class HashConfig {
 private:
     int p;
@@ -119,19 +119,58 @@ private:
     double alpha;
     int initSize;
     friend class ReducedConcatStringTree;
-};
-*/
-//class ReducedConcatStringTree /* */ {
-/*
 public:
-    class LitStringHash {
-    public:
-        LitStringHash(const HashConfig & hashConfig);
-        int getLastInsertedIndex() const;
-        string toString() const;
+    HashConfig();
+    HashConfig(int p, double c1, double c2, double lambda,
+               double alpha, int initSize);
+    void change(int p, double c1, double c2, double lambda,
+               double alpha, int initSize);
+    int getP() const;
+    double getC1() const;
+    double getC2() const;
+    double getLambda() const;
+    double getAlpha() const;
+    int getInitSize() const;
+};
+
+class LitStringHash {
+public:
+    struct LitString {
+
+        int num_refs;
+        ConcatStringTree::Node* nod;
+        LitString(int nums = 1, ConcatStringTree::Node* node = NULL) 
+        {
+            num_refs = nums;
+            nod = node;
+        }
     };
 public:
-    static LitStringHash litStringHash;
-};*/
+    HashConfig hashConfig=HashConfig();
+    int m;
+    int all_nodes=0;
+    int last_index=-1;
+    LitString* bucket=NULL;
+    STATUS* status=NULL;
 
+public:
+    LitStringHash();
+    LitStringHash(const HashConfig& hashConfig);
+    int getLastInsertedIndex() const;
+    string toString() const;
+
+    int h(string s);
+    int hp(string s, int i);
+    int insert(string s);
+    void Rehash();
+    void remove(string s);
+    int search(string s);
+};
+/*
+class ReducedConcatStringTree  {
+public:
+    ReducedConcatStringTree(const char* s, LitStringHash* litStringHash);
+    LitStringHash* litStringHash;
+};
+*/
 #endif // __CONCAT_STRING_TREE_H__

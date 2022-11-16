@@ -71,17 +71,60 @@ void tc4() {
     cout << s5.toString() << endl;
     cout << "char at index 8: " << s5.get(8) << endl;
     cout << "first appearance of a: " << s5.indexOf('a') << endl;
-    cout << s5.subString(1, 4).reverse().toString() << endl;
+    //cout << s5.subString(1, 4).reverse().toString() << endl;
 
     cout << s5.getParTreeStringPreOrder("ll") << endl;
     cout << endl;
+}/*
+void tc5() {
+    HashConfig hashConfig(
+        2,
+       0.5,
+       0.5,
+       0.75,
+         2,
+         4
+    );
+    LitStringHash * litStringHash = new LitStringHash(hashConfig);
+    ReducedConcatStringTree * s1 = new ReducedConcatStringTree("a", litStringHash);
+    ReducedConcatStringTree * s2 = new ReducedConcatStringTree("bb", litStringHash);
+
+    cout << s1->toString() << endl;
+    cout << s2->toString() << endl;
+    ReducedConcatStringTree * s3 = new ReducedConcatStringTree("bb", litStringHash);
+
+    cout << litStringHash->getLastInsertedIndex() << endl;
+    cout << litStringHash->toString() << endl;
+
+    delete litStringHash;
+    delete s3;
+    delete s1;
+    delete s2;
+     
+}*/
+void tc6() {
+    HashConfig hashConfig(
+        2,
+        0.5,
+        0.5,
+        0.75,
+        2,
+        4
+    );
+    LitStringHash* litStringHash = new LitStringHash(hashConfig);
+    litStringHash->insert("a");
+    //litStringHash->insert("a");
+    cout << litStringHash->getLastInsertedIndex() << endl;
+    cout << litStringHash->toString() << endl;
 }
 int main() {
     
-    tc1();
-    tc2();
-    tc3();
+    //tc1();
+    //tc2();
+    //tc3();
     //tc4();
+    //tc5();
+    tc6();
     _CrtDumpMemoryLeaks();
     system("pause");
     return 0;
