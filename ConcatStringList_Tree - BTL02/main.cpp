@@ -75,8 +75,9 @@ void tc4() {
 
     cout << s5.getParTreeStringPreOrder("ll") << endl;
     cout << endl;
-}/*
+}
 void tc5() {
+    cout << "//////////////TEST CASE 5////////////////\n";
     HashConfig hashConfig(
         2,
        0.5,
@@ -85,13 +86,14 @@ void tc5() {
          2,
          4
     );
-    LitStringHash * litStringHash = new LitStringHash(hashConfig);
-    ReducedConcatStringTree * s1 = new ReducedConcatStringTree("a", litStringHash);
-    ReducedConcatStringTree * s2 = new ReducedConcatStringTree("bb", litStringHash);
+    LitStringHash * litStringHash = DBG_NEW LitStringHash(hashConfig);
+    ReducedConcatStringTree * s1 = DBG_NEW ReducedConcatStringTree("a", litStringHash);
+    ReducedConcatStringTree * s2 = DBG_NEW ReducedConcatStringTree("bb", litStringHash);
+    ReducedConcatStringTree * s3 = DBG_NEW ReducedConcatStringTree(s1->concat(*s2));
 
     cout << s1->toString() << endl;
     cout << s2->toString() << endl;
-    ReducedConcatStringTree * s3 = new ReducedConcatStringTree("bb", litStringHash);
+    cout << s3->toString() << endl;
 
     cout << litStringHash->getLastInsertedIndex() << endl;
     cout << litStringHash->toString() << endl;
@@ -100,9 +102,10 @@ void tc5() {
     delete s3;
     delete s1;
     delete s2;
-     
-}*/
+    cout << endl;
+}
 void tc6() {
+    cout << "//////////////TEST CASE 6////////////////\n";
     HashConfig hashConfig(
         2,
         0.5,
@@ -111,7 +114,7 @@ void tc6() {
         2,
         4
     );
-    LitStringHash* litStringHash = new LitStringHash(hashConfig);
+    LitStringHash* litStringHash = DBG_NEW LitStringHash(hashConfig);
     string s1 = string("Hello");
     string s2 = string("there");
     string s3 = string("here");
@@ -123,6 +126,7 @@ void tc6() {
 
     cout << litStringHash->getLastInsertedIndex() << endl;
     cout << litStringHash->toString() << endl;
+    cout << endl;
 }
 int main() {
     
@@ -130,8 +134,8 @@ int main() {
     //tc2();
     //tc3();
     //tc4();
-    //tc5();
-    tc6();
+    tc5();
+    //tc6();
     _CrtDumpMemoryLeaks();
     system("pause");
     return 0;

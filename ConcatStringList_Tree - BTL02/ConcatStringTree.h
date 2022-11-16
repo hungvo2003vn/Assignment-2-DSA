@@ -124,6 +124,7 @@ public:
     HashConfig(const HashConfig& other);
     HashConfig(int p, double c1, double c2, double lambda,
                double alpha, int initSize);
+
     //Get the private value
     int getP() const;
     double getC1() const;
@@ -145,14 +146,15 @@ public:
     struct LitString {
 
         int num_refs;
-        string data;
-        LitString(int nums = 1, string s="")
+        ConcatStringTree::Node* nod;
+        LitString(int nums = 1, ConcatStringTree::Node* node=NULL)
         {
             num_refs = nums;
-            this->data = s;
+            nod = node;
         }
     };
 public:
+
     HashConfig hashConfig;
     int m;
     int all_nodes;
@@ -171,12 +173,18 @@ public:
     void Rehash();
     void remove(string s);
     int search(string s);
+    ~LitStringHash();
 };
-/*
-class ReducedConcatStringTree  {
+
+class ReducedConcatStringTree:public ConcatStringTree  {
 public:
     ReducedConcatStringTree(const char* s, LitStringHash* litStringHash);
     LitStringHash* litStringHash;
+
+    ReducedConcatStringTree();
+    ReducedConcatStringTree concat(const ReducedConcatStringTree& otherS) const;
+    string toStringPreOrder() const;
+    string toString() const;
 };
-*/
+
 #endif // __CONCAT_STRING_TREE_H__

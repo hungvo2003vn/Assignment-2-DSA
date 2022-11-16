@@ -485,9 +485,9 @@ string ConcatStringTree::getParTreeStringPreOrder(const string& query) const {
 void ConcatStringTree::Concat_delete(Node* cur) {
 	if (!cur) return;
 
-	if (cur->Par->size() != 0) Parents_delete(cur, cur->id);
+	if (cur->Par && cur->Par->size() != 0) Parents_delete(cur, cur->id);
 
-	if (cur->Par->size() == 0) 
+	if (cur->Par && cur->Par->size() == 0) 
 	{
 		Node* L = cur->left;
 		Node* R = cur->right;
@@ -499,7 +499,7 @@ void ConcatStringTree::Concat_delete(Node* cur) {
 		cur = NULL;
 
 		if(L && L->Par && L->Par->size()==0) Concat_delete(L);
-		if(R && R->Par && R->Par->size()==0)Concat_delete(R);
+		if(R && R->Par && R->Par->size()==0) Concat_delete(R);
 	}
 	return;
 }
@@ -579,6 +579,7 @@ LitStringHash::LitStringHash() {
 	bucket = NULL;
 	status = NULL;
 }
+//deep copy constructor
 LitStringHash::LitStringHash(const HashConfig& hashConfig) {
 
 	this->hashConfig = HashConfig(hashConfig);
@@ -592,6 +593,7 @@ LitStringHash::LitStringHash(const HashConfig& hashConfig) {
 	for (int i = 0; i < m; i++) status[i] = NIL;
 
 }
+//Hash fucntion
 int LitStringHash::h(string s) {
 	int ans = 0;
 	int times = 1;
@@ -602,6 +604,7 @@ int LitStringHash::h(string s) {
 	}
 	return ans;
 }
+//Find function
 int LitStringHash::hp(string s, int i) {
 	int ans = h(s);
 	double c1_i = hashConfig.getC1();
@@ -613,6 +616,7 @@ int LitStringHash::hp(string s, int i) {
 	ans =  (int)(ans*1.0+(c1_i+c2_i2)) % m;
 	return ans;
 }
+//Insert
 void LitStringHash::insert(string s) {
 	int i = 0;
 	do 
@@ -621,7 +625,7 @@ void LitStringHash::insert(string s) {
 		if (status[slot] == NIL || status[slot] == DELETED)
 		{
 			//Assign value
-			bucket[slot] = LitString(1, s);
+			bucket[slot] = LitString(1, new ConcatStringTree::Node(0,(int)s.length(), s, NULL, NULL));
 			status[slot] = NON_EMPTY;
 
 			//Update nums
@@ -631,7 +635,7 @@ void LitStringHash::insert(string s) {
 			Rehash(); //Rehashing
 			return;
 		}
-		else if (status[slot] == NON_EMPTY && bucket[slot].data==s) {
+		else if (status[slot] == NON_EMPTY && bucket[slot].nod->data==s) {
 			bucket[slot].num_refs++;
 
 			//Update nums
@@ -647,6 +651,7 @@ void LitStringHash::insert(string s) {
 	//No slot
 	throw runtime_error("No possible slot");
 }
+//Rehash
 void LitStringHash::Rehash() {
 	if (all_nodes / (1.0*m) - hashConfig.getLambda() >1e-7) 
 	{
@@ -660,7 +665,7 @@ void LitStringHash::Rehash() {
 		{
 			tatus[i] = status[i];
 			if (status[i] == NON_EMPTY) 
-				tmp[i] = LitString(bucket[i].num_refs, bucket[i].data);
+				tmp[i] = LitString(bucket[i].num_refs, bucket[i].nod);
 		}
 		delete[] status;
 		delete[] bucket;
@@ -673,33 +678,40 @@ void LitStringHash::Rehash() {
 		hashConfig.changeInitSize(m);
 	}
 }
+//Remove
 void LitStringHash::remove(string s) {
 	int i = 0;
 	do 
 	{
 		int slot = hp(s, i);
 		if (status[slot] == NIL) return;
-		else if (bucket[slot].data == s)
+		else if (status[slot]==NON_EMPTY && bucket[slot].nod->data == s)
 		{
 			--all_nodes;
-			status[slot] = DELETED;
+			--bucket[slot].num_refs;
+
+			if(bucket[slot].num_refs)
+				status[slot] = DELETED;
+
 			return; //WARNING
 		}
 		else ++i;
 	} while (i < m);
 	return;
 }
+//Search
 int LitStringHash::search(string s) {
 	int i = 0;
 	do 
 	{
 		int slot = hp(s, i);
-		if (status[slot] == NON_EMPTY && bucket[slot].data == s) return slot;
+		if (status[slot] == NON_EMPTY && bucket[slot].nod->data == s) return slot;
 		else if (status[slot] == NIL) return -1;
 		else ++i;
 	} while (i < m);
 	return -1;
 }
+//Required Function
 int LitStringHash::getLastInsertedIndex() const {
 	return this->last_index;
 }
@@ -708,10 +720,73 @@ string LitStringHash::toString() const {
 	for (int i = 0; i < m; i++) 
 	{
 		ans += "(";
-		if (status[i] == NON_EMPTY) ans += "litS=\"" + bucket[i].data + "\"";
+		if (status[i] == NON_EMPTY) ans += "litS=\"" + bucket[i].nod->data + "\"";
 		ans += ");";
 	}
 	if (ans.back() == ';') ans.pop_back();
 	return ans + "]\"";
+}
+//Destructor for LitStringHash
+LitStringHash::~LitStringHash() {
+	m = 0;
+	all_nodes = 0;
+	last_index = -1;
+	delete[] bucket;
+	delete[] status;
+	bucket = NULL;
+	status = NULL;
+}
+////////////CLASS REDUCEDCONCATSTRINGTREE///////////
+ReducedConcatStringTree::ReducedConcatStringTree(){
+	this->litStringHash = NULL;
+	Root = NULL;
+}
+ReducedConcatStringTree::ReducedConcatStringTree(const char* s, LitStringHash* litStringHash) {
+	this->litStringHash = litStringHash;
+	string tmp = string(s);
+	this->litStringHash->insert(tmp);
+
+	int slot = this->litStringHash->search(tmp);
+	Root = this->litStringHash->bucket[slot].nod;
+	
+	//Update Parent for Node
+	Root->Par = new ParentsTree();
+	Root->Par->Insert(max_id);
+}
+ReducedConcatStringTree ReducedConcatStringTree::concat(const ReducedConcatStringTree& otherS) const {
+
+	union S //Avoid auto-call destructor when get out of the scope
+	{
+		ReducedConcatStringTree ans;
+		S()
+		{
+			ans = ReducedConcatStringTree();
+		}
+		~S()
+		{
+
+		}
+	} pro;
+
+	pro.ans.Root = new Node(Root->length, Root->length + otherS.Root->length, "", Root, otherS.Root);
+
+	//Update Parent for Node
+	pro.ans.Root->Par = new ParentsTree();
+	Parents_add(pro.ans.Root, max_id);
+
+	//Assign LitStringHash
+	pro.ans.litStringHash = otherS.litStringHash;
+
+	return pro.ans;
+}
+string ReducedConcatStringTree::toStringPreOrder() const {
+
+	string ans = "\"ReducedConcatStringTree[" + pre_order(Root) + "]\"";
+	return ans;
+}
+string ReducedConcatStringTree::toString() const {
+	string ans = "\"ReducedConcatStringTree[\""
+		+ toString_helper(Root) + "\"]\"";
+	return ans;
 }
 
