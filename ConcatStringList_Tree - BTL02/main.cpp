@@ -99,12 +99,10 @@ void tc5() {
     cout << litStringHash->getLastInsertedIndex() << endl;
     cout << litStringHash->toString() << endl;
     
-    //delete litStringHash;
+    delete litStringHash;
     delete s3;
     delete s1;
     delete s2;
-    cout << litStringHash->toString() << endl;
-    delete litStringHash;
     cout << endl;
 }
 int main() {

@@ -626,6 +626,7 @@ void LitStringHash::insert(string s) {
 		}
 		else if (status[slot] == NON_EMPTY && bucket[slot].nod->data==s) {
 			bucket[slot].num_refs++;
+			bucket[slot].nod->num_refs++;
 
 			//Update nums
 			all_nodes++;
@@ -678,6 +679,7 @@ void LitStringHash::remove(string s) {
 		{
 			--all_nodes;
 			bucket[slot].num_refs--;
+			bucket[slot].nod->num_refs--;
 
 			if(bucket[slot].num_refs==0) status[slot] = DELETED;
 
@@ -825,9 +827,17 @@ void ReducedConcatStringTree::ReducedConcat_delete(Node* &cur) {
 		//Leaf node maybe has some references
 		if (!cur->left && !cur->right)
 		{
-			int slot = litStringHash->search(cur->data);
-			litStringHash->remove(cur->data);
-			if (litStringHash->status[slot] != DELETED) return;
+			if (litStringHash && litStringHash->all_nodes>0) 
+			{
+				int slot = litStringHash->search(cur->data);
+				litStringHash->remove(cur->data);
+				if (litStringHash->status[slot] != DELETED) return;
+			}
+			else 
+			{
+				cur->num_refs--;
+				if (cur->num_refs != 0) return;
+			}
 		}
 		Parents_delete(cur, cur->id);
 	}
