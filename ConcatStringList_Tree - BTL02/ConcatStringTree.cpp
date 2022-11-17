@@ -121,7 +121,7 @@ ConcatStringTree ConcatStringTree::concat(const ConcatStringTree& otherS) const 
 	//Update Parent for Node
 	pro.ans.Root->Par = new ParentsTree();
 	Parents_add(pro.ans.Root, max_id);
-
+	
 	return pro.ans;
 }
 //subStr
@@ -138,6 +138,10 @@ ConcatStringTree::Node* ConcatStringTree::combine(Node* L, Node* R) const {
 	//Add Parent to all node in the subtree "root"
 	root->Par = new ParentsTree();
 	Parents_add(root, max_id);
+
+	//Extra delete subtree
+	if (root->left && root->left->Par) root->left->Par->Remove(root->left->id);
+	if (root->right && root->right->Par) root->right->Par->Remove(root->right->id);
 
 	return root;
 }
@@ -675,7 +679,7 @@ void LitStringHash::remove(string s) {
 	{
 		int slot = hp(s, i);
 		if (status[slot] == NIL) return;
-		if (status[slot]==NON_EMPTY && bucket[slot].nod->data == s)
+		else if (status[slot]==NON_EMPTY && bucket[slot].nod->data == s)
 		{
 			--all_nodes;
 			bucket[slot].num_refs--;
@@ -742,8 +746,6 @@ ReducedConcatStringTree::ReducedConcatStringTree(const char* s, LitStringHash* l
 	this->litStringHash->insert(tmp);
 	int slot = this->litStringHash->search(tmp);
 	ReRoot = this->litStringHash->bucket[slot].nod;
-	ReRoot->left = NULL;
-	ReRoot->right = NULL;
 
 	//Initialize
 	Root = NULL;
@@ -841,25 +843,24 @@ void ReducedConcatStringTree::ReducedConcat_delete(Node* &cur) {
 		}
 		Parents_delete(cur, cur->id);
 	}
-	
 	if (cur->Par && cur->Par->size() == 0)
 	{
-		Node* L = cur->left;
-		Node* R = cur->right;
-		cur->left = NULL;
-		cur->right = NULL;
+		bool same_node = (cur->left==cur->right);
+		if (cur->left && cur->left->Par && cur->left->Par->size() == 0) ReducedConcat_delete(cur->left);
+
+		if (!same_node) 
+		{
+			if(cur->right && cur->right->Par && cur->right->Par->size() == 0) ReducedConcat_delete(cur->right);
+		}
 
 		if (cur->Par) delete cur->Par;
 		cur->Par = NULL;
 
+		cur->left = NULL;
+		cur->right = NULL;
 		delete cur;
 		cur = NULL;
-
-		if (L && L->Par && L->Par->size() == 0) ReducedConcat_delete(L);
-		if (R && R->Par && R->Par->size() == 0) ReducedConcat_delete(R);
-
 	}
-	
 	return;
 }
 ReducedConcatStringTree::~ReducedConcatStringTree() {
