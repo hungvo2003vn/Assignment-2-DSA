@@ -88,7 +88,7 @@ string ConcatStringTree::pre_order(Node* cur) const {
 }
 string ConcatStringTree::toStringPreOrder() const {
 
-	string ans = "\"ConcatStringTree[" + pre_order(Root) + "]\"";
+	string ans = "ConcatStringTree[" + pre_order(Root) + "]";
 	return ans;
 }
 //Tostring 
@@ -97,8 +97,8 @@ string ConcatStringTree::toString_helper(Node* cur) const {
 	else return cur->data + toString_helper(cur->left) + toString_helper(cur->right);
 }
 string ConcatStringTree::toString() const {
-	string ans = "\"ConcatStringTree[\""
-		+ toString_helper(Root) + "\"]\"";
+	string ans = "ConcatStringTree[\""
+		+ toString_helper(Root) + "\"]";
 	return ans;
 }
 //Concat
@@ -412,7 +412,7 @@ string ParentsTree::PreOrder(ConcatStringTree::ParNode* cur) const {
 	return ans;
 }
 string ParentsTree::toStringPreOrder() const {
-	string ans = "\"ParentsTree[" + PreOrder(Paroot) + "]\"";
+	string ans = "ParentsTree[" + PreOrder(Paroot) + "]";
 	return ans;
 }
 //Traverse Sub tree and add Parents 
@@ -710,7 +710,7 @@ int LitStringHash::getLastInsertedIndex() const {
 	return this->last_index;
 }
 string LitStringHash::toString() const {
-	string ans = "\"LitStringHash[";
+	string ans = "LitStringHash[";
 	for (int i = 0; i < m; i++) 
 	{
 		ans += "(";
@@ -718,7 +718,7 @@ string LitStringHash::toString() const {
 		ans += ");";
 	}
 	if (ans.back() == ';') ans.pop_back();
-	return ans + "]\"";
+	return ans + "]";
 }
 //Destructor for LitStringHash
 LitStringHash::~LitStringHash() {
@@ -780,12 +780,12 @@ ReducedConcatStringTree ReducedConcatStringTree::concat(const ReducedConcatStrin
 //tostring
 string ReducedConcatStringTree::toStringPreOrder() const {
 
-	string ans = "\"ReducedConcatStringTree[" + pre_order(ReRoot) + "]\"";
+	string ans = "ConcatStringTree[" + pre_order(ReRoot) + "]";
 	return ans;
 }
 string ReducedConcatStringTree::toString() const {
-	string ans = "\"ReducedConcatStringTree[\""
-		+ toString_helper(ReRoot) + "\"]\"";
+	string ans = "ConcatStringTree[\""
+		+ toString_helper(ReRoot) + "\"]";
 	return ans;
 }
 //Get Partree size
