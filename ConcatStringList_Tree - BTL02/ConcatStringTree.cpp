@@ -479,20 +479,6 @@ void ConcatStringTree::Concat_delete(Node* &cur) {
 
 	if (cur->Par && cur->Par->size() == 0) 
 	{
-		/*Node* L = cur->left;
-		Node* R = cur->right;
-		cur->left = NULL;
-		cur->right = NULL;
-
-		if (cur->Par) delete cur->Par;
-		cur->Par = NULL;
-
-		delete cur;
-		cur = NULL;
-
-		if(L && L->Par && L->Par->size()==0) Concat_delete(L);
-		if(R && R->Par && R->Par->size()==0) Concat_delete(R);*/
-
 		bool same_node = (cur->left == cur->right);
 		if (cur->left && cur->left->Par && cur->left->Par->size() == 0) Concat_delete(cur->left);
 

@@ -213,11 +213,11 @@ void tc7() {
     cout << s5->getParTreeStringPreOrder("l") << endl;
     cout << s5->getParTreeStringPreOrder("r") << endl;
     
-    delete s5;
-    delete s1;
-    delete s2;
-    delete s3;
-    delete s4;
+    //delete s5;
+    //delete s1;
+    //delete s2;
+    //delete s3;
+    //delete s4;
     
     _CrtDumpMemoryLeaks();
 }
