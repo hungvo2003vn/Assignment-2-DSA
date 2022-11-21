@@ -183,17 +183,13 @@ public:
 class ReducedConcatStringTree:public ConcatStringTree  {
 
 public:
-    Node* ReRoot;
     LitStringHash* litStringHash;
 
 public:
     ReducedConcatStringTree();
     ReducedConcatStringTree(const char* s, LitStringHash* litStringHash);
     ReducedConcatStringTree concat(const ReducedConcatStringTree& otherS) const;
-    string toStringPreOrder() const;
-    string toString() const;
-    int getParTreeSize(const string& query) const;
-    string getParTreeStringPreOrder(const string& query) const;
+    
     //Destructor
     void ReducedConcat_delete(Node* &cur);
     ~ReducedConcatStringTree();

@@ -24,6 +24,8 @@ void tc1() {
     }
     cout << s1.indexOf('b') << "." << endl;
     cout << endl;
+    s1.~ConcatStringTree();
+    _CrtDumpMemoryLeaks();
 }
 void tc2() {
     cout << "//////////////TEST CASE 2////////////////\n";
@@ -36,7 +38,12 @@ void tc2() {
     cout << s3.subString(5, 6).toString()<< endl;
     cout << s3.reverse().toString() << "." <<endl;
     cout << endl;
-    
+
+    s1.~ConcatStringTree();
+    s2.~ConcatStringTree();
+    s3.~ConcatStringTree();
+
+    _CrtDumpMemoryLeaks();
 }
 void tc3() {
     cout << "//////////////TEST CASE 3////////////////\n";
@@ -57,6 +64,8 @@ void tc3() {
     delete s1;
     delete s4;
     cout<<endl;
+
+    _CrtDumpMemoryLeaks();
 }
 void tc4() {
     cout << "//////////////TEST CASE 4////////////////\n";
@@ -69,12 +78,25 @@ void tc4() {
 
     cout << s5.toStringPreOrder() << endl;
     cout << s5.toString() << endl;
-    cout << "char at index 8: " << s5.get(8) << endl;
+    cout << "char at index 1: " << s5.get(1) << endl;
+    try {
+        cout << "char at index 8: " << s5.get(8) << "." << endl;
+    }
+    catch (const out_of_range& ofr) {
+        cout << "Exception out_of_range:" << ofr.what() << endl;
+    }
     cout << "first appearance of a: " << s5.indexOf('a') << endl;
-    //cout << s5.subString(1, 4).toString() << endl;
+    //cout << s5.subString(1, 4).reverse().toString() << endl;
 
     cout << s5.getParTreeStringPreOrder("ll") << endl;
     cout << endl;
+
+    s1.~ConcatStringTree();
+    s2.~ConcatStringTree();
+    s3.~ConcatStringTree();
+    s4.~ConcatStringTree();
+    s5.~ConcatStringTree();
+    _CrtDumpMemoryLeaks();
 }
 void tc5() {
     cout << "//////////////TEST CASE 5////////////////\n";
@@ -104,6 +126,8 @@ void tc5() {
     delete s1;
     delete s2;
     cout << endl;
+
+    _CrtDumpMemoryLeaks();
 }
 void tc6() {
     cout << "//////////////TEST CASE 6////////////////\n";
@@ -123,21 +147,90 @@ void tc6() {
     cout << litStringHash->getLastInsertedIndex() << endl;
     cout << litStringHash->toString() << endl;
 
+    cout << "Testing tostring\n";
+    cout << s3->toString() << endl;
+    cout << s3->toStringPreOrder() << endl;
+
+    cout << "Testing ParentsTree\n";
+    cout << s3->getParTreeSize("") << endl;
+    cout << s3->getParTreeStringPreOrder("") << endl;
+
+    cout << "Testing ParentsTree of node->left\n";
+    cout << s3->getParTreeSize("l") << endl;
+    cout << s3->getParTreeStringPreOrder("l") << endl;
+
+    cout << "Testing ParentsTree of node->right\n";
+    cout << s3->getParTreeSize("r") << endl;
+    cout << s3->getParTreeStringPreOrder("r") << endl;
+
+    cout << "Index Of char a: " << s3->indexOf('a') << "." << endl;
+    cout << "Char at index 1 is: " << s3->get(1) << "." << endl;
+
+    cout << "length of s3 is: " << s3->length() << endl;
+
+    try {
+        cout << "char at index 10: " << s3->get(10) << "." << endl;
+    }
+    catch (const out_of_range& ofr) {
+        cout << "Exception out_of_range:" << ofr.what() << endl;
+    }
     delete litStringHash;
     delete s1;
     delete s2;
     delete s3;
     cout << endl;
+
+    _CrtDumpMemoryLeaks();
+}
+void tc7() {
+    cout << "//////////////TEST CASE 7////////////////\n";
+    cout << "\n";
+    ConcatStringTree* s1= new ConcatStringTree("Hello");
+    ConcatStringTree* s2 = new ConcatStringTree(",_t");
+    ConcatStringTree* s3 = new ConcatStringTree("his_is");
+    ConcatStringTree* s4 = new ConcatStringTree("_an");
+    ConcatStringTree* s5 = new ConcatStringTree(s1->concat(*s2).concat(s3->concat(*s4))  );
+
+    cout << s5->toStringPreOrder() << endl;
+    cout << s5->toString() << endl;
+    cout << "char at index 1: " << s5->get(1) << endl;
+    try {
+        cout << "char at index 8: " << s5->get(8) << "." << endl;
+    }
+    catch (const out_of_range& ofr) {
+        cout << "Exception out_of_range:" << ofr.what() << endl;
+    }
+    cout << "first appearance of a: " << s5->indexOf('a') << endl;
+   // cout << s5->subString(1, 4).toString() << endl;
+
+    cout << s5->getParTreeStringPreOrder("") << endl;
+    cout << endl;
+
+    cout << s5->getParTreeStringPreOrder("ll") << endl;
+    cout << s5->getParTreeStringPreOrder("lr") << endl;
+    cout << s5->getParTreeStringPreOrder("rl") << endl;
+    cout << s5->getParTreeStringPreOrder("rr") << endl;
+    cout << s5->getParTreeStringPreOrder("l") << endl;
+    cout << s5->getParTreeStringPreOrder("r") << endl;
+    
+    delete s5;
+    delete s1;
+    delete s2;
+    delete s3;
+    delete s4;
+    
+    _CrtDumpMemoryLeaks();
 }
 int main() {
     
     tc1();
     tc2();
     tc3();
-    tc4();
+    //tc4();
     tc5();
     tc6();
-    _CrtDumpMemoryLeaks();
+    tc7();
+    //_CrtDumpMemoryLeaks();
     system("pause");
     return 0;
 }

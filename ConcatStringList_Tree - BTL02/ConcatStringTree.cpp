@@ -113,15 +113,16 @@ ConcatStringTree ConcatStringTree::concat(const ConcatStringTree& otherS) const 
 		}
 		~S()
 		{
-
+			
 		}
 	} pro;
 
-	pro.ans.Root = new Node(Root->length, Root->length + otherS.Root->length, "", Root, otherS.Root);
+	Node* TMP_ROOT = new Node(Root->length, Root->length + otherS.Root->length, "", Root, otherS.Root);
 	//Update Parent for Node
-	pro.ans.Root->Par = new ParentsTree();
-	Parents_add(pro.ans.Root, max_id);
+	TMP_ROOT->Par = new ParentsTree();
+	Parents_add(TMP_ROOT, max_id);
 	
+	pro.ans.Root = TMP_ROOT;
 	return pro.ans;
 }
 //subStr
@@ -393,7 +394,7 @@ void ParentsTree::Remove(int key) {
 	bool deleted = false;
 	Paroot = remove(Paroot, key, deleted);
 	if (deleted) --nums_node;
-
+	
 	return;
 }
 ///Format ParentsTree Functions
@@ -420,6 +421,7 @@ void ConcatStringTree::Parents_add(Node* cur, int key) const {
 	if (!cur) return;
 
 	cur->Par->Insert(key);
+	
 	if (cur->left) cur->left->Par->Insert(key);
 	if (cur->right) cur->right->Par->Insert(key);
 
@@ -477,7 +479,7 @@ void ConcatStringTree::Concat_delete(Node* &cur) {
 
 	if (cur->Par && cur->Par->size() == 0) 
 	{
-		Node* L = cur->left;
+		/*Node* L = cur->left;
 		Node* R = cur->right;
 		cur->left = NULL;
 		cur->right = NULL;
@@ -489,12 +491,29 @@ void ConcatStringTree::Concat_delete(Node* &cur) {
 		cur = NULL;
 
 		if(L && L->Par && L->Par->size()==0) Concat_delete(L);
-		if(R && R->Par && R->Par->size()==0) Concat_delete(R);
+		if(R && R->Par && R->Par->size()==0) Concat_delete(R);*/
+
+		bool same_node = (cur->left == cur->right);
+		if (cur->left && cur->left->Par && cur->left->Par->size() == 0) Concat_delete(cur->left);
+
+		if (!same_node)
+		{
+			if (cur->right && cur->right->Par && cur->right->Par->size() == 0) Concat_delete(cur->right);
+		}
+
+		if (cur->Par) delete cur->Par;
+		cur->Par = NULL;
+
+		cur->left = NULL;
+		cur->right = NULL;
+		delete cur;
+		cur = NULL;
 	}
 	return;
 }
 ConcatStringTree::~ConcatStringTree() {
 	Concat_delete(Root);
+	Root = NULL;
 }
 ////////////CLASS LITSTRINGHASH AND REDUCEDCONCATSTRINGTREE//////////////////////
 HashConfig::HashConfig() {
@@ -733,8 +752,6 @@ LitStringHash::~LitStringHash() {
 ////////////CLASS REDUCEDCONCATSTRINGTREE///////////
 ReducedConcatStringTree::ReducedConcatStringTree(){
 	this->litStringHash = NULL;
-	ReRoot = NULL;
-	Root = NULL;
 }
 //Constructor
 ReducedConcatStringTree::ReducedConcatStringTree(const char* s, LitStringHash* litStringHash) {
@@ -745,10 +762,7 @@ ReducedConcatStringTree::ReducedConcatStringTree(const char* s, LitStringHash* l
 	//Find node in litstringhash
 	this->litStringHash->insert(tmp);
 	int slot = this->litStringHash->search(tmp);
-	ReRoot = this->litStringHash->bucket[slot].nod;
-
-	//Initialize
-	Root = NULL;
+	Root = this->litStringHash->bucket[slot].nod;
 }
 //Concat
 ReducedConcatStringTree ReducedConcatStringTree::concat(const ReducedConcatStringTree& otherS) const {
@@ -766,59 +780,16 @@ ReducedConcatStringTree ReducedConcatStringTree::concat(const ReducedConcatStrin
 		}
 	} pro;
 
-	pro.ans.ReRoot = new Node(ReRoot->length, ReRoot->length + otherS.ReRoot->length, "", ReRoot, otherS.ReRoot);
+	pro.ans.Root = new Node(Root->length, Root->length + otherS.Root->length, "", Root, otherS.Root);
 
 	//Update Parent for Node
-	pro.ans.ReRoot->Par = new ParentsTree();
-	Parents_add(pro.ans.ReRoot, max_id);
+	pro.ans.Root->Par = new ParentsTree();
+	Parents_add(pro.ans.Root, max_id);
 
 	//Assign LitStringHash
 	pro.ans.litStringHash = otherS.litStringHash;
 
 	return pro.ans;
-}
-//tostring
-string ReducedConcatStringTree::toStringPreOrder() const {
-
-	string ans = "ConcatStringTree[" + pre_order(ReRoot) + "]";
-	return ans;
-}
-string ReducedConcatStringTree::toString() const {
-	string ans = "ConcatStringTree[\""
-		+ toString_helper(ReRoot) + "\"]";
-	return ans;
-}
-//Get Partree size
-int ReducedConcatStringTree::getParTreeSize(const string& query) const {
-	Node* tmp = ReRoot;
-	for (char c : query) {
-		if (!tmp)
-			throw runtime_error("Invalid query: reaching NULL");
-
-		if (c == 'l') tmp = tmp->left;
-		else if (c == 'r') tmp = tmp->right;
-		else
-			throw runtime_error("Invalid character of query");
-	}
-	if (!tmp)
-		throw runtime_error("Invalid query: reaching NULL");
-
-	return tmp->Par->size();
-}
-//get Partree preorder
-string ReducedConcatStringTree::getParTreeStringPreOrder(const string& query) const {
-	Node* tmp = ReRoot;
-
-	for (char c : query) {
-		if (!tmp)
-			throw runtime_error("Invalid query: reaching NULL");
-
-		if (c == 'l') tmp = tmp->left;
-		else if (c == 'r') tmp = tmp->right;
-		else
-			throw runtime_error("Invalid character of query");
-	}
-	return tmp->Par->toStringPreOrder();
 }
 //destructor 
 void ReducedConcatStringTree::ReducedConcat_delete(Node* &cur) {
@@ -864,6 +835,7 @@ void ReducedConcatStringTree::ReducedConcat_delete(Node* &cur) {
 	return;
 }
 ReducedConcatStringTree::~ReducedConcatStringTree() {
-	ReducedConcat_delete(ReRoot);
+	ReducedConcat_delete(Root);
+	Root = NULL;
 }
 
