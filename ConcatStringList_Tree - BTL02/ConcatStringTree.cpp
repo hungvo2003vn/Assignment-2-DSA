@@ -626,7 +626,7 @@ int LitStringHash::hp(string s, int i) {
 	return ans;
 }
 //Insert
-void LitStringHash::insert(string s) {
+void LitStringHash::Insert(string s, bool rehashing, LitString ele) {
 	int i = 0;
 	do 
 	{
@@ -634,25 +634,32 @@ void LitStringHash::insert(string s) {
 		if (status[slot] == NIL || status[slot] == DELETED)
 		{
 			//Assign value
-			bucket[slot] = LitString(1, new ConcatStringTree::Node(0, (int)s.length(), s, NULL, NULL));
-			bucket[slot].nod->Par = new ParentsTree();
-			bucket[slot].nod->Par->Insert(max_id);
+			if (rehashing) bucket[slot] = LitString(ele.num_refs, ele.nod);
+			else 
+			{
+				bucket[slot] = LitString(1, new ConcatStringTree::Node(0, (int)s.length(), s, NULL, NULL));
+				bucket[slot].nod->Par = new ParentsTree();
+				bucket[slot].nod->Par->Insert(max_id);
+			}
 
 			status[slot] = NON_EMPTY;
 
 			//Update nums
-			all_nodes++;
+			if(!rehashing) all_nodes++;
 			last_index = slot;
 
 			Rehash(); //Rehashing
 			return;
 		}
 		else if (status[slot] == NON_EMPTY && bucket[slot].nod->data==s) {
-			bucket[slot].num_refs++;
-			bucket[slot].nod->num_refs++;
+			if (!rehashing) 
+			{
+				bucket[slot].num_refs++;
+				bucket[slot].nod->num_refs++;
+			}
 
 			//Update nums
-			all_nodes++;
+			if (!rehashing) all_nodes++;
 			last_index = slot;
 
 			Rehash();//rehashing
@@ -669,27 +676,39 @@ void LitStringHash::Rehash() {
 	if (all_nodes / (1.0*m) - hashConfig.getLambda() >1e-7) 
 	{
 		int new_size = (int)(hashConfig.getAlpha() * m);
+		int old_size = m;
+		m = new_size;
 
 		LitString* tmp = new LitString[new_size];
-		STATUS* tatus = new STATUS[new_size];
-		for (int i = 0; i < new_size; i++) tatus[i] = NIL;
+		STATUS* cop = new STATUS[old_size];
+		
+		//Create copy status and renew status
+		for (int i = 0; i < old_size; i++) cop[i] = status[i];
+		delete[] status;
+		status = new STATUS[new_size];
+		for (int i = 0; i < new_size; i++) status[i] = NIL;
 
-		for (int i = 0; i < m && i < new_size; i++) 
+		//Copy old bucket data
+		for (int i = 0; i < old_size; i++)
 		{
-			tatus[i] = status[i];
-			if (status[i] == NON_EMPTY) 
+			if (cop[i] == NON_EMPTY) 
 				tmp[i] = LitString(bucket[i].num_refs, bucket[i].nod);
 		}
-		delete[] status;
+
 		delete[] bucket;
+		bucket = new LitString[new_size];
+		for (int i = 0; i < old_size; i++) 
+		{
+			if (cop[i] == NON_EMPTY) 
+				Insert(tmp[i].nod->data, true, tmp[i]);
+		}
 
-		bucket = tmp;
-		status = tatus;
-
-		//Update size and hashConfig
-		m = new_size;
-		hashConfig.changeInitSize(m);
+		delete[] cop;
+		delete[] tmp;
 	}
+}
+void LitStringHash::insert(string s) {
+	Insert(s);
 }
 //Remove
 void LitStringHash::remove(string s) {

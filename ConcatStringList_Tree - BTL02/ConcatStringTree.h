@@ -173,6 +173,7 @@ public:
 
     int h(string s);
     int hp(string s, int i);
+    void Insert(string s, bool rehashing = false, LitString ele = LitString());
     void insert(string s);
     void Rehash();
     void remove(string s);

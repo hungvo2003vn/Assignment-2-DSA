@@ -221,15 +221,43 @@ void tc7() {
     
     _CrtDumpMemoryLeaks();
 }
+void tc8() {
+    cout << "//////////////TEST CASE 8////////////////\n";
+    HashConfig hashConfig(
+        2,
+        0.5,
+        0.5,
+        0.75,
+        2,
+        4
+    );
+    LitStringHash* litStringHash = new LitStringHash(hashConfig);
+
+    try {
+        litStringHash->insert("Hello");
+        litStringHash->insert("this_is");
+        litStringHash->insert("Assignment_2");
+        litStringHash->insert("3");
+    }
+    catch (const runtime_error& re) {
+        cout << "Exception runtime_error:" << re.what() << endl;
+    }
+    cout << litStringHash->getLastInsertedIndex() << endl;
+    cout << litStringHash->toString() << endl;
+
+    delete litStringHash;
+    cout << endl;
+}
 int main() {
     
-    tc1();
-    tc2();
-    tc3();
+    //tc1();
+    //tc2();
+    //tc3();
     //tc4();
-    tc5();
-    tc6();
-    tc7();
+    //tc5();
+    //tc6();
+    //tc7();
+    tc8();
     //_CrtDumpMemoryLeaks();
     system("pause");
     return 0;
