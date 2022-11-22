@@ -11,6 +11,7 @@ ConcatStringTree::ConcatStringTree(const char* s) {
 	//Update Parent for Node
 	Root->Par = new ParentsTree();
 	Root->Par->Insert(max_id);
+
 }
 //Get length
 int ConcatStringTree::length() const {
@@ -103,7 +104,7 @@ string ConcatStringTree::toString() const {
 }
 //Concat
 ConcatStringTree ConcatStringTree::concat(const ConcatStringTree& otherS) const {
-
+	
 	union S //Avoid auto-call destructor when get out of the scope
 	{
 		ConcatStringTree ans;
@@ -117,12 +118,11 @@ ConcatStringTree ConcatStringTree::concat(const ConcatStringTree& otherS) const 
 		}
 	} pro;
 
-	Node* TMP_ROOT = new Node(Root->length, Root->length + otherS.Root->length, "", Root, otherS.Root);
+	pro.ans.Root = new Node(Root->length, Root->length + otherS.Root->length, "", Root, otherS.Root);
 	//Update Parent for Node
-	TMP_ROOT->Par = new ParentsTree();
-	Parents_add(TMP_ROOT, max_id);
+	pro.ans.Root->Par = new ParentsTree();
+	Parents_add(pro.ans.Root, max_id);
 	
-	pro.ans.Root = TMP_ROOT;
 	return pro.ans;
 }
 //subStr
@@ -394,6 +394,7 @@ void ParentsTree::Remove(int key) {
 	bool deleted = false;
 	Paroot = remove(Paroot, key, deleted);
 	if (deleted) --nums_node;
+	 
 	
 	return;
 }
@@ -432,9 +433,10 @@ void ConcatStringTree::Parents_delete(Node* cur, int key) const {
 	if (!cur) return;
 
 	cur->Par->Remove(key);
+	if (cur->Par->size() != 0) return;
 
-	if (cur->left && cur->left->Par) cur->left->Par->Remove(key);
-	if (cur->right && cur->right->Par) cur->right->Par->Remove(key);
+	if (cur->left && cur->left->Par) cur->left->Par->Remove(cur->id);
+	if (cur->right && cur->right->Par) cur->right->Par->Remove(cur->id);
 
 	return;
 }
@@ -475,18 +477,24 @@ string ConcatStringTree::getParTreeStringPreOrder(const string& query) const {
 void ConcatStringTree::Concat_delete(Node* &cur) {
 	if (!cur) return;
 
-	if (cur->Par && cur->Par->size() != 0) Parents_delete(cur, cur->id);
+	if (cur->Par) 
+	{
+		if(cur->Par->size()==1)
+			Parents_delete(cur, cur->Par->Paroot->id);
+		else Parents_delete(cur, cur->id);
+	}
 
 	if (cur->Par && cur->Par->size() == 0) 
 	{
 		bool same_node = (cur->left == cur->right);
+		
 		if (cur->left && cur->left->Par && cur->left->Par->size() == 0) Concat_delete(cur->left);
 
 		if (!same_node)
 		{
 			if (cur->right && cur->right->Par && cur->right->Par->size() == 0) Concat_delete(cur->right);
 		}
-
+		
 		if (cur->Par) delete cur->Par;
 		cur->Par = NULL;
 
@@ -527,44 +535,6 @@ HashConfig::HashConfig(int P, double C1, double C2, double Lambda,
 	this->alpha = Alpha;
 	this->initSize = InitSize;
 }
-//Get the private value
-int HashConfig::getP() const {
-	return this->p;
-}
-double HashConfig::getC1() const {
-	return this->c1;
-}
-double HashConfig::getC2() const {
-	return this->c2;
-}
-double HashConfig::getLambda() const {
-	return this->lambda;
-}
-double HashConfig::getAlpha() const {
-	return this->alpha;
-}
-int HashConfig::getInitSize() const {
-	return this->initSize;
-}
-//Chang the private value
-void HashConfig::changeP(int P) {
-	p = P;
-}
-void HashConfig::changeC1(double C1) {
-	c1 = C1;
-}
-void HashConfig::changeC2(double C2) {
-	c2 = C2;
-}
-void HashConfig::changeLambda(double Lambda) {
-	lambda = Lambda;
-}
-void HashConfig::changeAlpha(double Alpha) {
-	alpha = Alpha;
-}
-void HashConfig::changeInitSize(int InitSize) {
-	initSize = InitSize;
-}
 ////////////CLASS LITSTRINGHASH///////////
 LitStringHash::LitStringHash() {
 	hashConfig = HashConfig();
@@ -579,7 +549,7 @@ LitStringHash::LitStringHash(const HashConfig& hashConfig) {
 
 	this->hashConfig = HashConfig(hashConfig);
 
-	m = this->hashConfig.getInitSize();
+	m = this->hashConfig.initSize;
 	all_nodes = 0;
 	last_index = -1;
 
@@ -595,15 +565,15 @@ int LitStringHash::h(string s) {
 	for (int i = 0; i < (int)s.length(); i++)
 	{
 		ans = (ans + ( ((int)s[i])%m * times)%m )%m;
-		times = (times * ((hashConfig.getP())%m)  )%m;
+		times = (times * ((hashConfig.p)%m)  )%m;
 	}
 	return ans;
 }
 //Find function
 int LitStringHash::hp(string s, int i) {
 	int ans = h(s);
-	double c1_i = hashConfig.getC1();
-	double c2_i2 = hashConfig.getC2();
+	double c1_i = hashConfig.c1;
+	double c2_i2 = hashConfig.c2;
 
 	c1_i*=i;
 	c2_i2 *= i * i;
@@ -659,9 +629,9 @@ void LitStringHash::Insert(string s, bool rehashing, LitString ele) {
 }
 //Rehash
 void LitStringHash::Rehash() {
-	if (all_nodes / (1.0*m) - hashConfig.getLambda() >1e-7) 
+	if (all_nodes / (1.0*m) - hashConfig.lambda >1e-7) 
 	{
-		int new_size = (int)(hashConfig.getAlpha() * m);
+		int new_size = (int)(hashConfig.alpha * m);
 		int old_size = m;
 		m = new_size;
 
@@ -771,7 +741,7 @@ ReducedConcatStringTree::ReducedConcatStringTree(const char* s, LitStringHash* l
 }
 //Concat
 ReducedConcatStringTree ReducedConcatStringTree::concat(const ReducedConcatStringTree& otherS) const {
-
+	
 	union S //Avoid auto-call destructor when get out of the scope
 	{
 		ReducedConcatStringTree ans;
@@ -800,10 +770,10 @@ ReducedConcatStringTree ReducedConcatStringTree::concat(const ReducedConcatStrin
 void ReducedConcatStringTree::ReducedConcat_delete(Node* &cur) {
 	if (!cur) return;
 	
-	if (cur->Par && cur->Par->size() != 0) 
+	if (cur->Par) 
 	{
 		//Leaf node maybe has some references
-		if (!cur->left && !cur->right)
+		if (!cur->left && !cur->right && cur->num_refs!=0)
 		{
 			if (litStringHash && litStringHash->all_nodes>0) 
 			{
@@ -817,7 +787,9 @@ void ReducedConcatStringTree::ReducedConcat_delete(Node* &cur) {
 				if (cur->num_refs != 0) return;
 			}
 		}
-		Parents_delete(cur, cur->id);
+		if (cur->Par->size() == 1)
+			Parents_delete(cur, cur->Par->Paroot->id);
+		else Parents_delete(cur, cur->id);
 	}
 	if (cur->Par && cur->Par->size() == 0)
 	{

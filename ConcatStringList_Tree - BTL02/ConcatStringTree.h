@@ -52,7 +52,7 @@ public:
         }
     };
     Node* Root;
-
+    
 public:
     ConcatStringTree();
     ConcatStringTree(const char* s);
@@ -122,27 +122,12 @@ private:
     double lambda;
     double alpha;
     int initSize;
-    friend class ReducedConcatStringTree;
+    friend class LitStringHash;
 public:
     HashConfig();
     HashConfig(const HashConfig& other);
     HashConfig(int p, double c1, double c2, double lambda,
                double alpha, int initSize);
-
-    //Get the private value
-    int getP() const;
-    double getC1() const;
-    double getC2() const;
-    double getLambda() const;
-    double getAlpha() const;
-    int getInitSize() const;
-    //Change the private value
-    void changeP(int P);
-    void changeC1(double C1);
-    void changeC2(double C2);
-    void changeLambda(double Lambda);
-    void changeAlpha (double Alpha);
-    void changeInitSize(int InitSize);
 };
 
 class LitStringHash {
@@ -173,6 +158,7 @@ public:
 
     int h(string s);
     int hp(string s, int i);
+
     void Insert(string s, bool rehashing = false, LitString ele = LitString());
     void insert(string s);
     void Rehash();
