@@ -307,6 +307,38 @@ void tc9() {
 
     _CrtDumpMemoryLeaks();
 }
+void tc10() {
+    cout << "//////////////TEST CASE 10////////////////\n";
+    cout << "\n";
+    ConcatStringTree* s1 = DBG_NEW ConcatStringTree("a");
+    ConcatStringTree* s2 = DBG_NEW ConcatStringTree("b");
+    ConcatStringTree* s3 = DBG_NEW ConcatStringTree("c");
+    ConcatStringTree* s4 = DBG_NEW ConcatStringTree(s1->concat(*s2));
+    ConcatStringTree* s5 = DBG_NEW ConcatStringTree(s2->concat(*s3));
+    ConcatStringTree* s6 = DBG_NEW ConcatStringTree("d");
+    ConcatStringTree* s7 = DBG_NEW ConcatStringTree(s4->concat(*s5).concat(*s6));
+
+    cout << s7->getParTreeStringPreOrder("lll") << endl;
+    cout << s7->getParTreeStringPreOrder("llr") << endl;
+    cout << s7->getParTreeStringPreOrder("lrr") << endl;
+    cout << s7->getParTreeStringPreOrder("ll") << endl;
+    cout << s7->getParTreeStringPreOrder("lr") << endl;
+    cout << s7->getParTreeStringPreOrder("r") << endl;
+    cout << s7->getParTreeStringPreOrder("l") << endl;
+    cout << s7->getParTreeStringPreOrder("") << endl;
+    cout << endl;
+
+    delete s4;
+    delete s5;
+    delete s7;
+    delete s1;
+    delete s2;
+    delete s3;
+    delete s6;
+    cout << endl;
+
+    _CrtDumpMemoryLeaks();
+}
 int main() {
     
     tc1();
@@ -318,6 +350,7 @@ int main() {
     tc7();
     //tc8();
     tc9();
+    tc10();
     //_CrtDumpMemoryLeaks();
     
     system("pause");

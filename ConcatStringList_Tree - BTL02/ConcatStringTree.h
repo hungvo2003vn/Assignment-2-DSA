@@ -31,7 +31,6 @@ public:
         Node* left;
         Node* right;
         ParentsTree* Par;
-        int num_refs = 0;
 
         Node(int LLen = 0, int len = 0, string s = "", Node* L = NULL, Node* R = NULL)
         {
@@ -41,9 +40,7 @@ public:
             data = s;
             left = L;
             right = R;
-
-            num_refs = 1;
-
+            
             max_id++;
             id = max_id;
 
@@ -135,8 +132,8 @@ public:
     struct LitString {
 
         int num_refs;
-        ConcatStringTree::Node* nod;
-        LitString(int nums = 1, ConcatStringTree::Node* node=NULL)
+        string nod;
+        LitString(int nums = 1, string node = "")
         {
             num_refs = nums;
             nod = node;

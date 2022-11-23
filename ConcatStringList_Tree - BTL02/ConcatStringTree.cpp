@@ -477,12 +477,7 @@ string ConcatStringTree::getParTreeStringPreOrder(const string& query) const {
 void ConcatStringTree::Concat_delete(Node* &cur) {
 	if (!cur) return;
 
-	if (cur->Par) 
-	{
-		if(cur->Par->size()==1)
-			Parents_delete(cur, cur->Par->Paroot->id);
-		else Parents_delete(cur, cur->id);
-	}
+	if (cur->Par) Parents_delete(cur, cur->id);
 
 	if (cur->Par && cur->Par->size() == 0) 
 	{
@@ -591,12 +586,7 @@ void LitStringHash::Insert(string s, bool rehashing, LitString ele) {
 		{
 			//Assign value
 			if (rehashing) bucket[slot] = LitString(ele.num_refs, ele.nod);
-			else 
-			{
-				bucket[slot] = LitString(1, new ConcatStringTree::Node(0, (int)s.length(), s, NULL, NULL));
-				bucket[slot].nod->Par = new ParentsTree();
-				bucket[slot].nod->Par->Insert(max_id);
-			}
+			else bucket[slot] = LitString(1, s);
 
 			status[slot] = NON_EMPTY;
 
@@ -607,12 +597,8 @@ void LitStringHash::Insert(string s, bool rehashing, LitString ele) {
 			Rehash(); //Rehashing
 			return;
 		}
-		else if (status[slot] == NON_EMPTY && bucket[slot].nod->data==s) {
-			if (!rehashing) 
-			{
-				bucket[slot].num_refs++;
-				bucket[slot].nod->num_refs++;
-			}
+		else if (status[slot] == NON_EMPTY && bucket[slot].nod==s) {
+			if (!rehashing) bucket[slot].num_refs++;
 
 			//Update nums
 			if (!rehashing) all_nodes++;
@@ -656,7 +642,7 @@ void LitStringHash::Rehash() {
 		for (int i = 0; i < old_size; i++) 
 		{
 			if (cop[i] == NON_EMPTY) 
-				Insert(tmp[i].nod->data, true, tmp[i]);
+				Insert(tmp[i].nod, true, tmp[i]);
 		}
 
 		delete[] cop;
@@ -673,11 +659,10 @@ void LitStringHash::remove(string s) {
 	{
 		int slot = hp(s, i);
 		if (status[slot] == NIL) return;
-		else if (status[slot]==NON_EMPTY && bucket[slot].nod->data == s)
+		else if (status[slot]==NON_EMPTY && bucket[slot].nod == s)
 		{
 			--all_nodes;
 			bucket[slot].num_refs--;
-			bucket[slot].nod->num_refs--;
 
 			if(bucket[slot].num_refs==0) status[slot] = DELETED;
 
@@ -693,7 +678,7 @@ int LitStringHash::search(string s) {
 	do 
 	{
 		int slot = hp(s, i);
-		if (status[slot] == NON_EMPTY && bucket[slot].nod->data == s) return slot;
+		if (status[slot] == NON_EMPTY && bucket[slot].nod == s) return slot;
 		else if (status[slot] == NIL ) return -1;
 		else ++i;
 	} while (i < m);
@@ -708,7 +693,7 @@ string LitStringHash::toString() const {
 	for (int i = 0; i < m; i++) 
 	{
 		ans += "(";
-		if (status[i] == NON_EMPTY) ans += "litS=\"" + bucket[i].nod->data + "\"";
+		if (status[i] == NON_EMPTY) ans += "litS=\"" + bucket[i].nod + "\"";
 		ans += ");";
 	}
 	if (ans.back() == ';') ans.pop_back();
@@ -736,8 +721,11 @@ ReducedConcatStringTree::ReducedConcatStringTree(const char* s, LitStringHash* l
 
 	//Find node in litstringhash
 	this->litStringHash->insert(tmp);
-	int slot = this->litStringHash->search(tmp);
-	Root = this->litStringHash->bucket[slot].nod;
+	Root = new Node(0, (int)tmp.length(), tmp, NULL, NULL);
+
+	//Update Parent for Node
+	Root->Par = new ParentsTree();
+	Root->Par->Insert(max_id);
 }
 //Concat
 ReducedConcatStringTree ReducedConcatStringTree::concat(const ReducedConcatStringTree& otherS) const {
@@ -773,23 +761,13 @@ void ReducedConcatStringTree::ReducedConcat_delete(Node* &cur) {
 	if (cur->Par) 
 	{
 		//Leaf node maybe has some references
-		if (!cur->left && !cur->right && cur->num_refs!=0)
+		if (!cur->left && !cur->right)
 		{
 			if (litStringHash && litStringHash->all_nodes>0) 
-			{
-				int slot = litStringHash->search(cur->data);
 				litStringHash->remove(cur->data);
-				if (litStringHash->status[slot] != DELETED) return;
-			}
-			else 
-			{
-				cur->num_refs--;
-				if (cur->num_refs != 0) return;
-			}
 		}
-		if (cur->Par->size() == 1)
-			Parents_delete(cur, cur->Par->Paroot->id);
-		else Parents_delete(cur, cur->id);
+		//Keep deleting Parents
+		Parents_delete(cur, cur->id);
 	}
 	if (cur->Par && cur->Par->size() == 0)
 	{
