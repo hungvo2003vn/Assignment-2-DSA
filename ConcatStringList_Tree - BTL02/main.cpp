@@ -33,10 +33,11 @@ void tc2() {
     ConcatStringTree s1("Hello");
     ConcatStringTree s2(",_t");
     ConcatStringTree s3 = s1.concat(s2);
+    
     cout << s3.toStringPreOrder() << "." << endl;
     cout << s3.toString() << "." << endl;
-    //cout << s3.subString(5, 6).toString()<< endl;
-    //cout << s3.reverse().toString() << "." <<endl;
+    cout << s3.subString(5, 6).toString()<< endl;
+    cout << s3.reverse().toString() << "." <<endl;
     cout << endl;
 
     s1.~ConcatStringTree();
@@ -86,7 +87,7 @@ void tc4() {
         cout << "Exception out_of_range:" << ofr.what() << endl;
     }
     cout << "first appearance of a: " << s5.indexOf('a') << endl;
-    //cout << s5.subString(1, 4).reverse().toString() << endl;
+    cout << s5.subString(1, 4).reverse().concat(s3).subString(0,5).toString() << endl;
 
     cout << s5.getParTreeStringPreOrder("ll") << endl;
     cout << endl;
@@ -170,7 +171,7 @@ void tc6() {
     catch (const out_of_range& ofr) {
         cout << "Exception out_of_range:" << ofr.what() << endl;
     }
-    delete litStringHash;
+    
     delete s1;
     cout << "Testing ParentsTree\n";
     cout << s3->getParTreeStringPreOrder("") << endl;
@@ -184,6 +185,10 @@ void tc6() {
     cout << s3->getParTreeStringPreOrder("r") << endl;
     cout << endl;
     delete s3;
+
+    cout << litStringHash->getLastInsertedIndex() << endl;
+    cout << litStringHash->toString() << endl;
+    delete litStringHash;
     cout << endl;
 
     _CrtDumpMemoryLeaks();
@@ -207,7 +212,7 @@ void tc7() {
         cout << "Exception out_of_range:" << ofr.what() << endl;
     }
     cout << "first appearance of a: " << s5->indexOf('a') << endl;
-   // cout << s5->subString(1, 4).toString() << endl;
+    cout << s5->subString(1, 4).toString() << endl;
 
     cout << s5->getParTreeStringPreOrder("") << endl;
     cout << endl;
@@ -282,6 +287,8 @@ void tc8() {
 
     delete litStringHash;
     cout << endl;
+
+    _CrtDumpMemoryLeaks();
 }
 void tc9() {
     cout << "//////////////TEST CASE 9////////////////\n";
@@ -348,9 +355,10 @@ int main() {
     tc5();
     tc6();
     tc7();
-    //tc8();
+    tc8();
     tc9();
     tc10();
+    
     //_CrtDumpMemoryLeaks();
     
     system("pause");

@@ -52,6 +52,10 @@ public:
     
 public:
     ConcatStringTree();
+    ConcatStringTree(ConcatStringTree&& obj) noexcept {
+        Root = move(obj.Root);
+        obj.Root = NULL;
+    }
     ConcatStringTree(const char* s);
     int length() const;
     char get(int index) const;
@@ -171,6 +175,12 @@ public:
 
 public:
     ReducedConcatStringTree();
+    ReducedConcatStringTree(ReducedConcatStringTree&& obj) noexcept {
+        Root = move(obj.Root);
+        litStringHash = move(obj.litStringHash);
+        obj.Root = NULL;
+        obj.litStringHash = NULL;
+    } 
     ReducedConcatStringTree(const char* s, LitStringHash* litStringHash);
     ReducedConcatStringTree concat(const ReducedConcatStringTree& otherS) const;
     

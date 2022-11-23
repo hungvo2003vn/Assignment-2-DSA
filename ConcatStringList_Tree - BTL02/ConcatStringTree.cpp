@@ -105,25 +105,14 @@ string ConcatStringTree::toString() const {
 //Concat
 ConcatStringTree ConcatStringTree::concat(const ConcatStringTree& otherS) const {
 	
-	union S //Avoid auto-call destructor when get out of the scope
-	{
-		ConcatStringTree ans;
-		S()
-		{
-			ans = ConcatStringTree();
-		}
-		~S()
-		{
-			
-		}
-	} pro;
+	ConcatStringTree ans = ConcatStringTree();
 
-	pro.ans.Root = new Node(Root->length, Root->length + otherS.Root->length, "", Root, otherS.Root);
+	ans.Root = new Node(Root->length, Root->length + otherS.Root->length, "", Root, otherS.Root);
 	//Update Parent for Node
-	pro.ans.Root->Par = new ParentsTree();
-	Parents_add(pro.ans.Root, max_id);
+	ans.Root->Par = new ParentsTree();
+	Parents_add(ans.Root, max_id);
 	
-	return pro.ans;
+	return ans;
 }
 //subStr
 ConcatStringTree::Node* ConcatStringTree::combine(Node* L, Node* R) const {
@@ -181,21 +170,10 @@ ConcatStringTree ConcatStringTree::subString(int from, int to) const {
 	if (from >= to)
 		throw logic_error("Invalid range!");
 
-	union S //Avoid auto-call destructor when get out of the scope
-	{
-		ConcatStringTree ans;
-		S()
-		{
-			ans = ConcatStringTree();
-		}
-		~S()
-		{
+	ConcatStringTree ans = ConcatStringTree();
 
-		}
-	} pro;
-
-	pro.ans.Root = build_bottom(Root, 0, from, to);
-	return pro.ans;
+	ans.Root = build_bottom(Root, 0, from, to);
+	return ans;
 }
 //Reverse
 ConcatStringTree::Node* ConcatStringTree::deepRe(Node* cur) const {
@@ -217,21 +195,10 @@ ConcatStringTree::Node* ConcatStringTree::deepRe(Node* cur) const {
 }
 ConcatStringTree ConcatStringTree::reverse() const {
 	
-	union S //Avoid auto-call destructor when get out of the scope
-	{
-		ConcatStringTree ans;
-		S()
-		{
-			ans = ConcatStringTree();
-		}
-		~S()
-		{
+	ConcatStringTree ans = ConcatStringTree();
 
-		}
-	} pro;
-
-	pro.ans.Root = deepRe(Root);
-	return pro.ans;
+	ans.Root = deepRe(Root);
+	return ans;
 }
 //////////////////////PARENTSTREE IMPLEMENTATION/////////////////////////
 ParentsTree::ParentsTree() {
@@ -693,7 +660,7 @@ string LitStringHash::toString() const {
 	for (int i = 0; i < m; i++) 
 	{
 		ans += "(";
-		if (status[i] == NON_EMPTY) ans += "litS=\"" + bucket[i].nod + "\"";
+		if (status && status[i] == NON_EMPTY) ans += "litS=\"" + bucket[i].nod + "\"";
 		ans += ");";
 	}
 	if (ans.back() == ';') ans.pop_back();
@@ -730,29 +697,18 @@ ReducedConcatStringTree::ReducedConcatStringTree(const char* s, LitStringHash* l
 //Concat
 ReducedConcatStringTree ReducedConcatStringTree::concat(const ReducedConcatStringTree& otherS) const {
 	
-	union S //Avoid auto-call destructor when get out of the scope
-	{
-		ReducedConcatStringTree ans;
-		S()
-		{
-			ans = ReducedConcatStringTree();
-		}
-		~S()
-		{
+	ReducedConcatStringTree ans = ReducedConcatStringTree();
 
-		}
-	} pro;
-
-	pro.ans.Root = new Node(Root->length, Root->length + otherS.Root->length, "", Root, otherS.Root);
+	ans.Root = new Node(Root->length, Root->length + otherS.Root->length, "", Root, otherS.Root);
 
 	//Update Parent for Node
-	pro.ans.Root->Par = new ParentsTree();
-	Parents_add(pro.ans.Root, max_id);
+	ans.Root->Par = new ParentsTree();
+	Parents_add(ans.Root, max_id);
 
 	//Assign LitStringHash
-	pro.ans.litStringHash = otherS.litStringHash;
+	ans.litStringHash = otherS.litStringHash;
 
-	return pro.ans;
+	return ans;
 }
 //destructor 
 void ReducedConcatStringTree::ReducedConcat_delete(Node* &cur) {
@@ -787,6 +743,7 @@ void ReducedConcatStringTree::ReducedConcat_delete(Node* &cur) {
 		delete cur;
 		cur = NULL;
 	}
+	
 	return;
 }
 ReducedConcatStringTree::~ReducedConcatStringTree() {
