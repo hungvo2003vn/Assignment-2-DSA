@@ -521,14 +521,27 @@ LitStringHash::LitStringHash(const HashConfig& hashConfig) {
 
 }
 //Hash fucntion
+int MulMod(int a, int b, int M) {
+	int res = 0;
+	a = a % M;
+	while (b > 0) {
+		if (b % 2 == 1) res = (res + a) % M;
+		a = (a * 2) % M;
+		b = b / 2;
+	}
+	return res;
+}
+int PowMod(int a, int n, int M) {
+	if (n == 0) return 1;
+	int tmp = PowMod(a, n / 2, M);
+	if (n % 2 == 1) return (MulMod(tmp, tmp, M) * a) % M;
+	else return MulMod(tmp, tmp, M);
+}
 int LitStringHash::h(string s) {
 	int ans = 0;
-	int times = 1;
 	for (int i = 0; i < (int)s.length(); i++)
-	{
-		ans = (ans + ( ((int)s[i])%m * times)%m )%m;
-		times = (times * ((hashConfig.p)%m)  )%m;
-	}
+		ans = (ans + ((int)s[i] % m * PowMod(hashConfig.p, i, m)) % m) % m;
+
 	return ans;
 }
 //Find function
