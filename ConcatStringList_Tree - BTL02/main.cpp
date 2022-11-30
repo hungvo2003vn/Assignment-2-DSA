@@ -280,6 +280,11 @@ void tc8() {
         litStringHash->insert("this_is");
         litStringHash->insert("Assignment_2");
         litStringHash->insert("3");
+
+        litStringHash->insert("Hello");
+        litStringHash->insert("this_is");
+        litStringHash->insert("Assignment_2");
+        litStringHash->insert("3");
     }
     catch (const runtime_error& re) {
         cout << "Exception runtime_error:" << re.what() << endl;
@@ -348,9 +353,45 @@ void tc10() {
 
     _CrtDumpMemoryLeaks();
 }
+void tc11() {
+    cout << "//////////////TEST CASE 11////////////////\n";
+    cout << "\n";
+    ConcatStringTree* s1 = DBG_NEW ConcatStringTree("a");
+    ConcatStringTree* s2 = DBG_NEW ConcatStringTree("b");
+    ConcatStringTree* s3 = DBG_NEW ConcatStringTree(s1->concat(*s2));
+    ConcatStringTree* s4 = DBG_NEW ConcatStringTree(s3->concat(*s1));
+
+    cout << s4->getParTreeStringPreOrder("r") << endl;
+    cout << s4->getParTreeStringPreOrder("lr") << endl;
+    cout << s4->getParTreeStringPreOrder("l") << endl;
+    cout << s4->getParTreeStringPreOrder("") << endl;
+    cout << endl;
+
+    delete s1;
+    cout << s4->getParTreeStringPreOrder("r") << endl;
+    cout << s4->getParTreeStringPreOrder("lr") << endl;
+    cout << s4->getParTreeStringPreOrder("l") << endl;
+    cout << s4->getParTreeStringPreOrder("") << endl;
+    cout << endl;
+    delete s2;
+    cout << s4->getParTreeStringPreOrder("r") << endl;
+    cout << s4->getParTreeStringPreOrder("lr") << endl;
+    cout << s4->getParTreeStringPreOrder("l") << endl;
+    cout << s4->getParTreeStringPreOrder("") << endl;
+    cout << endl;
+    delete s3;
+    cout << s4->getParTreeStringPreOrder("r") << endl;
+    cout << s4->getParTreeStringPreOrder("lr") << endl;
+    cout << s4->getParTreeStringPreOrder("l") << endl;
+    cout << s4->getParTreeStringPreOrder("") << endl;
+    cout << endl;
+    delete s4;
+    cout << endl;
+    _CrtDumpMemoryLeaks();
+}
 int main() {
     
-    tc1();
+    /*tc1();
     tc2();
     tc3();
     tc4();
@@ -359,8 +400,8 @@ int main() {
     tc7();
     tc8();
     tc9();
-    tc10();
-    
+    tc10();*/
+    tc11();
     //_CrtDumpMemoryLeaks();
     
     system("pause");

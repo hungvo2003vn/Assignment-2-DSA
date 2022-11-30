@@ -3,7 +3,7 @@
 
 #include "main.h"
 
-static int max_id=0;
+extern int max_id;
 enum STATUS { NIL, NON_EMPTY, DELETED }; //status type
 class ParentsTree; //forward declaration
 class ConcatStringTree {
@@ -86,9 +86,7 @@ public:
     Node* deepRe(Node* cur) const;
     //add parent recursion
     void Parents_add(Node* cur, int key) const;
-    void Parents_delete(Node* cur, int key) const;
     //delete parent recursion
-    
     void Concat_delete(Node* &cur);
 };
 class ParentsTree {
@@ -165,6 +163,8 @@ public:
     void Rehash();
     void remove(string s);
     int search(string s);
+    void renew();
+    void retrieve();
     ~LitStringHash();
 };
 
