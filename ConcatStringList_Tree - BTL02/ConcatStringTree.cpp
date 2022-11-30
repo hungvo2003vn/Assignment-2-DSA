@@ -165,7 +165,8 @@ ConcatStringTree::Node* ConcatStringTree::build_bottom(Node* cur, int start, int
 		                build_bottom(cur->right, start + cur->leftLength, from, to));
 }
 ConcatStringTree ConcatStringTree::subString(int from, int to) const {
-	if (from<0 || to>Root->length)
+	
+	if (from<0 || from>=Root->length || to>Root->length || to<0)
 		throw out_of_range("Index of string is invalid!");
 	if (from >= to)
 		throw logic_error("Invalid range!");
@@ -182,7 +183,7 @@ ConcatStringTree::Node* ConcatStringTree::deepRe(Node* cur) const {
 	if (!cur->left && !cur->right) //Attemp Leaf Node
 	{
 		string s = string(cur->data.rbegin(), cur->data.rend());
-		Node* new_ele = new Node(cur->length - cur->leftLength, cur->length, s, NULL, NULL);
+		Node* new_ele = new Node(0, cur->length, s, NULL, NULL);
 
 		//Update Parent for the node
 		new_ele->Par = new ParentsTree();
@@ -258,7 +259,7 @@ ConcatStringTree::ParNode* ParentsTree::insert(ConcatStringTree::ParNode* cur, i
 	if (!cur)
 	{
 		nums_node++;
-		return (new ConcatStringTree::ParNode(key, NULL, NULL, 0));
+		return (new ConcatStringTree::ParNode(key, NULL, NULL, 1));
 	}
 
 	if (key < cur->id) cur->left = insert(cur->left, key);
@@ -270,17 +271,17 @@ ConcatStringTree::ParNode* ParentsTree::insert(ConcatStringTree::ParNode* cur, i
 	int balance = getBalance(cur);
 
 	//LL rotate case
-	if (balance > 1 && cur->id < cur->left->id) return Rtate(cur);
+	if (balance > 1 && key < cur->left->id) return Rtate(cur);
 	//RR rotate case
-	if (balance < -1 && cur->id > cur->right->id) return Ltate(cur);
+	if (balance < -1 && key > cur->right->id) return Ltate(cur);
 	//LR rotate case
-	if (balance > 1 && cur->id > cur->left->id)
+	if (balance > 1 && key > cur->left->id)
 	{
 		cur->left = Ltate(cur->left);
 		return Rtate(cur);
 	}
 	//RL rotate case
-	if (balance < -1 && cur->id < cur->right->id)
+	if (balance < -1 && key < cur->right->id)
 	{
 		cur->right = Rtate(cur->right);
 		return Ltate(cur);
@@ -310,10 +311,12 @@ ConcatStringTree::ParNode* ParentsTree::remove(ConcatStringTree::ParNode* cur, i
 			}
 			else
 			{
+				/*
 				cur->id = tmp->id;
 				cur->left = tmp->left;
 				cur->right = tmp->right;
-				cur->height = tmp->height; 
+				cur->height = tmp->height; */
+				*cur = *tmp;
 			}
 
 			if(tmp) delete tmp; 
@@ -437,6 +440,9 @@ string ConcatStringTree::getParTreeStringPreOrder(const string& query) const {
 		else
 			throw runtime_error("Invalid character of query");
 	}
+	if (!tmp)
+		throw runtime_error("Invalid query: reaching NULL");
+
 	return tmp->Par->toStringPreOrder();
 }
 ///DESTRUCTOR OF CONCATSTRINGTREE///
@@ -450,18 +456,18 @@ void ConcatStringTree::Concat_delete(Node* &cur) {
 	{
 		bool same_node = (cur->left == cur->right);
 		
-		if (cur->left && cur->left->Par && cur->left->Par->size() == 0) Concat_delete(cur->left);
+		if (cur->left && cur->left->length >=0 && cur->left->Par && cur->left->Par->size() == 0) Concat_delete(cur->left);
 
 		if (!same_node)
 		{
-			if (cur->right && cur->right->Par && cur->right->Par->size() == 0) Concat_delete(cur->right);
+			if (cur->right && cur->right->length >=0 && cur->right->Par && cur->right->Par->size() == 0) Concat_delete(cur->right);
 		}
 		
 		if (cur->Par) delete cur->Par;
 		cur->Par = NULL;
 
-		cur->left = NULL;
-		cur->right = NULL;
+		//cur->left = NULL;
+		//cur->right = NULL;
 		delete cur;
 		cur = NULL;
 	}
@@ -574,7 +580,6 @@ void LitStringHash::Insert(string s, bool rehashing, LitString ele) {
 			if(!rehashing) all_nodes++;
 			last_index = slot;
 
-			Rehash(); //Rehashing
 			return;
 		}
 		else if (status[slot] == NON_EMPTY && bucket[slot].nod==s) {
@@ -584,7 +589,6 @@ void LitStringHash::Insert(string s, bool rehashing, LitString ele) {
 			if (!rehashing) all_nodes++;
 			last_index = slot;
 
-			Rehash();//rehashing
 			return;
 		}
 		else ++i;
@@ -603,20 +607,21 @@ void LitStringHash::Rehash() {
 
 		LitString* tmp = new LitString[new_size];
 		STATUS* cop = new STATUS[old_size];
-		
-		//Create copy status and renew status
-		for (int i = 0; i < old_size; i++) cop[i] = status[i];
-		delete[] status;
-		status = new STATUS[new_size];
-		for (int i = 0; i < new_size; i++) status[i] = NIL;
 
-		//Copy old bucket data
+		//Copy old data
 		for (int i = 0; i < old_size; i++)
 		{
+			cop[i] = status[i];
 			if (cop[i] == NON_EMPTY) 
 				tmp[i] = LitString(bucket[i].num_refs, bucket[i].nod);
 		}
 
+		//New status
+		delete[] status;
+		status = new STATUS[new_size];
+		for (int i = 0; i < new_size; i++) status[i] = NIL;
+
+		//New bucket
 		delete[] bucket;
 		bucket = new LitString[new_size];
 		for (int i = 0; i < old_size; i++) 
@@ -624,13 +629,13 @@ void LitStringHash::Rehash() {
 			if (cop[i] == NON_EMPTY) 
 				Insert(tmp[i].nod, true, tmp[i]);
 		}
-
-		delete[] cop;
 		delete[] tmp;
+		delete[] cop;
 	}
 }
 void LitStringHash::insert(string s) {
 	Insert(s);
+	Rehash();
 }
 //Remove
 void LitStringHash::remove(string s) {
@@ -732,8 +737,10 @@ void ReducedConcatStringTree::ReducedConcat_delete(Node* &cur) {
 		//Leaf node maybe has some references
 		if (!cur->left && !cur->right)
 		{
-			if (litStringHash && litStringHash->all_nodes>0) 
+			if (litStringHash && litStringHash->all_nodes > 0) 
+			{
 				litStringHash->remove(cur->data);
+			}
 		}
 		//Keep deleting Parents
 		Parents_delete(cur, cur->id);
@@ -741,18 +748,18 @@ void ReducedConcatStringTree::ReducedConcat_delete(Node* &cur) {
 	if (cur->Par && cur->Par->size() == 0)
 	{
 		bool same_node = (cur->left==cur->right);
-		if (cur->left && cur->left->Par && cur->left->Par->size() == 0) ReducedConcat_delete(cur->left);
+		if (cur->left && cur->left->length >= 0 && cur->left->Par && cur->left->Par->size() == 0) ReducedConcat_delete(cur->left);
 
 		if (!same_node) 
 		{
-			if(cur->right && cur->right->Par && cur->right->Par->size() == 0) ReducedConcat_delete(cur->right);
+			if(cur->right && cur->right->length >= 0 && cur->right->Par && cur->right->Par->size() == 0) ReducedConcat_delete(cur->right);
 		}
 
 		if (cur->Par) delete cur->Par;
 		cur->Par = NULL;
 
-		cur->left = NULL;
-		cur->right = NULL;
+		//cur->left = NULL;
+		//cur->right = NULL;
 		delete cur;
 		cur = NULL;
 	}

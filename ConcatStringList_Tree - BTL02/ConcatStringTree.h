@@ -15,7 +15,7 @@ public:
         ParNode* right;
         int height;
 
-        ParNode(int key = 0, ParNode* L = NULL, ParNode* R = NULL, int hi = 0)
+        ParNode(int key = 0, ParNode* L = NULL, ParNode* R = NULL, int hi = 1)
         {
             id = key;
             left = L;
