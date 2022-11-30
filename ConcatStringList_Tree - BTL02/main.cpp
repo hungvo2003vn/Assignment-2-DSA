@@ -389,9 +389,45 @@ void tc11() {
     cout << endl;
     _CrtDumpMemoryLeaks();
 }
+void tc12() {
+    cout << "//////////////TEST CASE 11////////////////\n";
+    cout << "\n";
+
+    HashConfig hashConfig(2, 0.202826, 0.854946, 0.761086, 3.40681, 6);
+    LitStringHash* litStringHash = new LitStringHash(hashConfig);
+
+    try {
+        litStringHash->insert("GwqWNM1dJf");
+        cout << litStringHash->getLastInsertedIndex() << endl;
+        cout << litStringHash->toString() << endl;
+
+        litStringHash->insert("2Knle6wCEmqbeeI8KJK3");
+        cout << litStringHash->getLastInsertedIndex() << endl;
+        cout << litStringHash->toString() << endl;
+
+        litStringHash->insert("FPvNrImp7n1d0");
+        cout << litStringHash->getLastInsertedIndex() << endl;
+        cout << litStringHash->toString() << endl;
+
+        litStringHash->insert("wtbtDgcsc3U9yc5nadbd");
+        cout << litStringHash->getLastInsertedIndex() << endl;
+        cout << litStringHash->toString() << endl;
+
+        litStringHash->insert("QZL8dvdf");
+        cout << litStringHash->getLastInsertedIndex() << endl;
+        cout << litStringHash->toString() << endl;
+    }
+    catch (const runtime_error& re) {
+        cout << "Exception runtime_error:" << re.what() << endl;
+    }
+    delete litStringHash;
+    cout << endl;
+
+    _CrtDumpMemoryLeaks();
+}
 int main() {
     
-    /*tc1();
+    tc1();
     tc2();
     tc3();
     tc4();
@@ -400,8 +436,9 @@ int main() {
     tc7();
     tc8();
     tc9();
-    tc10();*/
+    tc10();
     tc11();
+    tc12();
     //_CrtDumpMemoryLeaks();
     
     system("pause");

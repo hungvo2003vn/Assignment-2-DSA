@@ -311,15 +311,7 @@ ConcatStringTree::ParNode* ParentsTree::remove(ConcatStringTree::ParNode* cur, i
 				tmp = cur;
 				cur = NULL;
 			}
-			else
-			{
-				/*
-				cur->id = tmp->id;
-				cur->left = tmp->left;
-				cur->right = tmp->right;
-				cur->height = tmp->height; */
-				*cur = *tmp;
-			}
+			else *cur = *tmp;
 
 			if(tmp) delete tmp; 
 			tmp = NULL;
@@ -522,28 +514,30 @@ int MulMod(int a, int b, int M) {
 		a = (a * 2) % M;
 		b = b / 2;
 	}
-	return res%M;
+	return res;
 }
 int PowMod(int a, int n, int M) {
 	if (n == 0) return 1;
+	if (a == 0) return 0;
 	int tmp = PowMod(a, n / 2, M);
-	if (n % 2 == 1) return (MulMod(tmp, tmp, M) * a) % M;
-	else return MulMod(tmp, tmp, M)%M;
+	if (n % 2 == 1) return MulMod(MulMod(tmp, tmp, M), a, M);
+	else return MulMod(tmp, tmp, M);
 }
 int LitStringHash::h(string s) {
 	int ans = 0;
 	for (int i = 0; i < (int)s.length(); i++)
 		ans += MulMod((int)s[i], PowMod(hashConfig.p, i, m), m) % m;
-		//ans += s[i] * pow(hashConfig.p, i);
 
-	return ans%m;
+	return ans;
 }
 //Find function
 int LitStringHash::hp(string s, int i) {
-	return ((int)(h(s)*1.0 + 1.0*hashConfig.c1*i + 1.0*hashConfig.c2*i*i))%m;
+	return ((int)(h(s) + hashConfig.c1*i + hashConfig.c2*i*i))%m;
 }
 //Insert
 void LitStringHash::Insert(string s, bool rehashing, LitString ele) {
+	
+	renew(); //Check if the hash table existed or not
 	int i = 0;
 	do 
 	{
@@ -557,18 +551,13 @@ void LitStringHash::Insert(string s, bool rehashing, LitString ele) {
 			status[slot] = NON_EMPTY;
 
 			//Update nums
-			if(!rehashing) all_nodes++;
+			if (!rehashing) all_nodes++;
 			last_index = slot;
 
 			return;
 		}
 		else if (status[slot] == NON_EMPTY && bucket[slot].nod==s) {
 			if (!rehashing) bucket[slot].num_refs++;
-
-			//Update nums
-			if (!rehashing) all_nodes++;
-			last_index = slot;
-
 			return;
 		}
 		else ++i;
@@ -579,13 +568,13 @@ void LitStringHash::Insert(string s, bool rehashing, LitString ele) {
 }
 //Rehash
 void LitStringHash::Rehash() {
-	if (all_nodes / (1.0*m) - hashConfig.lambda >(1e-7)) 
+	if ( (double)all_nodes/m - hashConfig.lambda > (1e-7) ) 
 	{
 		int new_size = (int)(hashConfig.alpha * m);
 		int old_size = m;
 		m = new_size;
 
-		LitString* tmp = new LitString[new_size];
+		LitString* tmp = new LitString[old_size];
 		STATUS* cop = new STATUS[old_size];
 
 		//Copy old data
@@ -604,18 +593,33 @@ void LitStringHash::Rehash() {
 		//New bucket
 		delete[] bucket;
 		bucket = new LitString[new_size];
+
+		int before_hash = last_index;
+		bool found = false;
+
 		for (int i = 0; i < old_size; i++) 
 		{
 			if (cop[i] == NON_EMPTY) 
+			{
 				Insert(tmp[i].nod, true, tmp[i]);
+
+				//Catch the new last_index that contain the value of the old last_index
+				if (i == before_hash && !found) 
+				{
+					found = true;
+					before_hash = last_index;
+				}
+			}	
 		}
+		last_index = before_hash;
+
 		delete[] tmp;
 		delete[] cop;
 	}
 }
 void LitStringHash::insert(string s) {
 	Insert(s);
-	if (all_nodes / (1.0 * m) - hashConfig.lambda > 1e-7) Rehash();
+	Rehash();
 }
 //Remove
 void LitStringHash::remove(string s) {
@@ -626,12 +630,15 @@ void LitStringHash::remove(string s) {
 		if (status[slot] == NIL) return;
 		else if (status[slot]==NON_EMPTY && bucket[slot].nod == s)
 		{
-			--all_nodes;
 			bucket[slot].num_refs--;
 
-			if(bucket[slot].num_refs==0) status[slot] = DELETED;
-
-			return; //WARNING
+			if (bucket[slot].num_refs == 0) 
+			{
+				--all_nodes;
+				status[slot] = DELETED;
+				retrieve();
+			}
+			return;
 		}
 		else ++i;
 	} while (i < m);
@@ -666,7 +673,7 @@ string LitStringHash::toString() const {
 }
 //Check and Renew
 void LitStringHash::renew() {
-	if (all_nodes != 0) return;
+	if (m > 0) return;
 
 	m = this->hashConfig.initSize;
 	all_nodes = 0;
@@ -677,7 +684,7 @@ void LitStringHash::renew() {
 	for (int i = 0; i < m; i++) status[i] = NIL;
 }
 void LitStringHash::retrieve() {
-	if (all_nodes != 0) return;
+	if (all_nodes > 0) return;
 	m = 0;
 	last_index = -1;
 	delete[] bucket;
@@ -698,11 +705,10 @@ LitStringHash::~LitStringHash() {
 ////////////CLASS REDUCEDCONCATSTRINGTREE///////////
 ReducedConcatStringTree::ReducedConcatStringTree(){
 	this->litStringHash = NULL;
+	this->Root = NULL;
 }
 //Constructor
 ReducedConcatStringTree::ReducedConcatStringTree(const char* s, LitStringHash* litStringHash) {
-	
-	//if (litStringHash) litStringHash->renew();
 	
 	this->litStringHash = litStringHash;
 	string tmp = string(s);
@@ -725,9 +731,9 @@ ReducedConcatStringTree ReducedConcatStringTree::concat(const ReducedConcatStrin
 	//Update Parent for Node
 	ans.Root->Par = new ParentsTree();
 	Parents_add(ans.Root, max_id);
-
-	//Assign LitStringHash
-	ans.litStringHash = otherS.litStringHash;
+	
+	//Assgin listringHash
+	ans.litStringHash = litStringHash;
 
 	return ans;
 }
@@ -735,24 +741,21 @@ ReducedConcatStringTree ReducedConcatStringTree::concat(const ReducedConcatStrin
 void ReducedConcatStringTree::ReducedConcat_delete(Node* &cur) {
 	if (!cur) return;
 	
-	if (!cur->left && !cur->right)
-	{
-		if (litStringHash && litStringHash->all_nodes > 0)
-		{
-			litStringHash->remove(cur->data);
-			//litStringHash->retrieve();
-		}
-	}
 	cur->Par->Remove(cur->id);
 	if (cur->Par->size() == 0) 
 	{
+		if (!cur->left && !cur->right)
+		{
+			litStringHash->remove(cur->data);
+		}
+
 		//Delete Left
 		if (cur->left) cur->left->Par->Remove(cur->id);
-		if (cur->left && cur->left->Par->size() == 0) Concat_delete(cur->left);
+		if (cur->left && cur->left->Par->size() == 0) ReducedConcat_delete(cur->left);
 
 		//Delete Right
 		if (cur->right) cur->right->Par->Remove(cur->id);
-		if (cur->right && cur->right->Par->size() == 0) Concat_delete(cur->right);
+		if (cur->right && cur->right->Par->size() == 0) ReducedConcat_delete(cur->right);
 
 		if (cur->Par) delete cur->Par;
 		cur->Par = NULL;
