@@ -162,7 +162,6 @@ public:
     void insert(string s);
     void Rehash();
     void remove(string s);
-    int search(string s);
     void renew();
     void retrieve();
     ~LitStringHash();

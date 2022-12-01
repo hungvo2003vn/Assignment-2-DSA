@@ -644,18 +644,7 @@ void LitStringHash::remove(string s) {
 	} while (i < m);
 	return;
 }
-//Search
-int LitStringHash::search(string s) {
-	int i = 0;
-	do 
-	{
-		int slot = hp(s, i);
-		if (status[slot] == NON_EMPTY && bucket[slot].nod == s) return slot;
-		else if (status[slot] == NIL ) return -1;
-		else ++i;
-	} while (i < m);
-	return -1;
-}
+
 //Required Function
 int LitStringHash::getLastInsertedIndex() const {
 	return this->last_index;
