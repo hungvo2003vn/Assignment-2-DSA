@@ -60,15 +60,15 @@ public:
     int length() const;
     char get(int index) const;
     int indexOf(char c) const;
-    virtual string toStringPreOrder() const;
-    virtual string toString() const;
-    virtual ConcatStringTree concat(const ConcatStringTree& otherS) const;
+    string toStringPreOrder() const;
+    string toString() const;
+    ConcatStringTree concat(const ConcatStringTree& otherS) const;
     ConcatStringTree subString(int from, int to) const;
     ConcatStringTree reverse() const;
 
-    virtual int getParTreeSize(const string& query) const;
-    virtual string getParTreeStringPreOrder(const string& query) const;
-    virtual ~ConcatStringTree();
+    int getParTreeSize(const string& query) const;
+    string getParTreeStringPreOrder(const string& query) const;
+    ~ConcatStringTree();
 
     //Helper Function
     //get and indexOf
