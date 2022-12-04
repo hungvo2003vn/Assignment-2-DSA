@@ -636,7 +636,7 @@ void LitStringHash::remove(string s) {
 			{
 				--all_nodes;
 				status[slot] = DELETED;
-				if(all_nodes == 0) this->~LitStringHash();
+				retrieve();
 			}
 			return;
 		}
@@ -671,6 +671,17 @@ void LitStringHash::renew() {
 	bucket = new LitString[m];
 	status = new STATUS[m];
 	for (int i = 0; i < m; i++) status[i] = NIL;
+}
+//Check and Retrieve
+void LitStringHash::retrieve() {
+	if (all_nodes > 0) return;
+
+	m = 0;
+	last_index = -1;
+	delete[] bucket;
+	delete[] status;
+	bucket = NULL;
+	status = NULL;
 }
 //Destructor for LitStringHash
 LitStringHash::~LitStringHash() {

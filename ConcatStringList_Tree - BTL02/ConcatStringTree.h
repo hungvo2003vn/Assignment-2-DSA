@@ -163,6 +163,7 @@ public:
     void Rehash();
     void remove(string s);
     void renew();
+    void retrieve();
     ~LitStringHash();
 };
 
