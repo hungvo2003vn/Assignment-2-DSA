@@ -636,7 +636,7 @@ void LitStringHash::remove(string s) {
 			{
 				--all_nodes;
 				status[slot] = DELETED;
-				retrieve();
+				if(all_nodes == 0) this->~LitStringHash();
 			}
 			return;
 		}
@@ -672,17 +672,9 @@ void LitStringHash::renew() {
 	status = new STATUS[m];
 	for (int i = 0; i < m; i++) status[i] = NIL;
 }
-void LitStringHash::retrieve() {
-	if (all_nodes > 0) return;
-	m = 0;
-	last_index = -1;
-	delete[] bucket;
-	delete[] status;
-	bucket = NULL;
-	status = NULL;
-}
 //Destructor for LitStringHash
 LitStringHash::~LitStringHash() {
+	
 	m = 0;
 	all_nodes = 0;
 	last_index = -1;
@@ -733,11 +725,8 @@ void ReducedConcatStringTree::ReducedConcat_delete(Node* &cur) {
 	cur->Par->Remove(cur->id);
 	if (cur->Par->size() == 0) 
 	{
-		if (!cur->left && !cur->right)
-		{
-			litStringHash->remove(cur->data);
-		}
-
+		if (!cur->left && !cur->right) litStringHash->remove(cur->data);
+		
 		//Delete Left
 		if (cur->left) cur->left->Par->Remove(cur->id);
 		if (cur->left && cur->left->Par->size() == 0) ReducedConcat_delete(cur->left);

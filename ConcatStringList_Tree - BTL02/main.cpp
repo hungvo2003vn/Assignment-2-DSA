@@ -439,7 +439,6 @@ int main() {
     tc10();
     tc11();
     tc12();
-    //_CrtDumpMemoryLeaks();
     
     system("pause");
     return 0;
